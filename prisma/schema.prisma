@@ -7,8 +7,340 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int    @id @default(autoincrement())
-  name  String
-  email String @unique
+model academicyear {
+  id         String       @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  branch_id  String?      @db.Uuid
+  name       String       @db.VarChar(100)
+  name_local String?      @db.VarChar(100)
+  start_date DateTime?    @db.Date
+  end_date   DateTime?    @db.Date
+  term_id    String?      @db.Uuid
+  created_at DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at DateTime?    @default(now()) @db.Timestamp(6)
+  branch     branch?      @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  term       term?        @relation(fields: [term_id], references: [id], onUpdate: NoAction)
+  enrollment enrollment[]
+  expense    expense[]
+}
+
+model assessment {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  term_id      String?       @db.Uuid
+  section_id   String?       @db.Uuid
+  subject      String        @db.VarChar(100)
+  max_score    Int
+  classsection classsection? @relation(fields: [section_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  term         term?         @relation(fields: [term_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  mark         mark[]
+}
+
+model attendance {
+  id           String                 @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  student_id   String?                @db.Uuid
+  section_id   String?                @db.Uuid
+  date         DateTime               @db.Date
+  status       attendance_status_enum
+  classsection classsection?          @relation(fields: [section_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  enrollment   enrollment?            @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model behavior {
+  id          String             @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  student_id  String?            @db.Uuid
+  date        DateTime?          @db.Date
+  description String?
+  type        behavior_type_enum
+  enrollment  enrollment?        @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model branch {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  school_id    String?        @db.Uuid
+  name         String         @db.VarChar(100)
+  location     String?        @db.VarChar(255)
+  academicyear academicyear[]
+  school       school?        @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  classsection classsection[]
+  expense      expense[]
+  librarybook  librarybook[]
+  parent       parent[]
+  staff        staff[]
+  student      student[]
+  teacher      teacher[]
+  term         term[]
+}
+
+model classsection {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  branch_id    String?      @db.Uuid
+  class_name   String?      @db.VarChar(50)
+  section_name String?      @db.VarChar(50)
+  assessment   assessment[]
+  attendance   attendance[]
+  branch       branch?      @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  enrollment   enrollment[]
+  timetable    timetable[]
+}
+
+model enrollment {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  student_id         String?              @db.Uuid
+  section_id         String?              @db.Uuid
+  academic_year_id   String?              @db.Uuid
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  attendance         attendance[]
+  behavior           behavior[]
+  academicyear       academicyear?        @relation(fields: [academic_year_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  classsection       classsection?        @relation(fields: [section_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  student            student?             @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  fee                fee[]
+  librarytransaction librarytransaction[]
+  mark               mark[]
+}
+
+model expense {
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  branch_id        String?       @db.Uuid
+  academic_year_id String?       @db.Uuid
+  description      String?
+  amount           Decimal       @db.Decimal(10, 2)
+  date             DateTime?     @db.Date
+  academicyear     academicyear? @relation(fields: [academic_year_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  branch           branch?       @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model fee {
+  id         String          @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  student_id String?         @db.Uuid
+  amount     Decimal         @db.Decimal(10, 2)
+  due_date   DateTime?       @db.Date
+  status     fee_status_enum
+  type       fee_type_enum
+  attachment String?         @db.VarChar(255)
+  note       String?
+  created_at DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at DateTime?       @default(now()) @db.Timestamp(6)
+  enrollment enrollment?     @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model financesummary {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  full_name       String?      @db.VarChar(200)
+  full_name_local String?      @db.VarChar(200)
+  gender          gender_enum?
+  ay_name         String?      @db.VarChar(100)
+  ay_name_local   String?      @db.VarChar(100)
+  total_fee       Decimal?     @db.Decimal(10, 2)
+  total_expense   Decimal?     @db.Decimal(10, 2)
+  net_balance     Decimal?     @db.Decimal(10, 2)
+  created_at      DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?    @default(now()) @db.Timestamp(6)
+}
+
+model leaverequest {
+  id         String            @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  staff_id   String?           @db.Uuid
+  start_date DateTime?         @db.Date
+  end_date   DateTime?         @db.Date
+  reason     String?
+  status     leave_status_enum
+  staff      staff?            @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model librarybook {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  branch_id          String?              @db.Uuid
+  title              String               @db.VarChar(255)
+  author             String?              @db.VarChar(255)
+  isbn               String?              @db.VarChar(50)
+  copies_available   Int?                 @default(0)
+  branch             branch?              @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  librarytransaction librarytransaction[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model librarytransaction {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  book_id     String?      @db.Uuid
+  student_id  String?      @db.Uuid
+  teacher_id  String?      @db.Uuid
+  issue_date  DateTime?    @db.Date
+  return_date DateTime?    @db.Date
+  status      String?      @db.VarChar(20)
+  islost      Boolean?     @default(false)
+  note        String?
+  librarybook librarybook? @relation(fields: [book_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  enrollment  enrollment?  @relation(fields: [student_id], references: [id], onUpdate: NoAction)
+  teacher     teacher?     @relation(fields: [teacher_id], references: [id], onUpdate: NoAction)
+}
+
+model mark {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  student_id    String?     @db.Uuid
+  assessment_id String?     @db.Uuid
+  score         Decimal?    @db.Decimal(5, 2)
+  created_at    DateTime?   @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?   @default(now()) @db.Timestamp(6)
+  assessment    assessment? @relation(fields: [assessment_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  enrollment    enrollment? @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model parent {
+  id             String  @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  better_auth_id String? @db.Uuid
+  first_name     String  @db.VarChar(100)
+  last_name      String  @db.VarChar(100)
+  phone          String? @db.VarChar(50)
+  email          String? @db.VarChar(100)
+  address        String?
+  note           String?
+  branch_id      String? @db.Uuid
+  branch         branch? @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model school {
+  id      String   @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  name    String   @db.VarChar(255)
+  address String?
+  contact String?  @db.VarChar(100)
+  note    String?
+  branch  branch[]
+}
+
+model staff {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  better_auth_id String?         @db.Uuid
+  first_name     String          @db.VarChar(100)
+  last_name      String          @db.VarChar(100)
+  role           staff_role_enum
+  branch_id      String?         @db.Uuid
+  leaverequest   leaverequest[]
+  branch         branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model student {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  better_auth_id  String?      @db.Uuid
+  first_name      String       @db.VarChar(100)
+  last_name       String       @db.VarChar(100)
+  full_name_local String?      @db.VarChar(200)
+  gender          gender_enum?
+  dob             DateTime?    @db.Date
+  address         String?
+  phone           String?      @db.VarChar(50)
+  note            String?
+  branch_id       String?      @db.Uuid
+  enrollment      enrollment[]
+  branch          branch?      @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model studentmarksummary {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  full_name       String?      @db.VarChar(200)
+  full_name_local String?      @db.VarChar(200)
+  gender          gender_enum?
+  ay_name         String?      @db.VarChar(100)
+  ay_name_local   String?      @db.VarChar(100)
+  subject         String?      @db.VarChar(100)
+  total_score     Decimal?     @db.Decimal(10, 2)
+  average_score   Decimal?     @db.Decimal(5, 2)
+  created_at      DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?    @default(now()) @db.Timestamp(6)
+}
+
+model teacher {
+  id                     String               @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  better_auth_id         String?              @db.Uuid
+  first_name             String               @db.VarChar(100)
+  last_name              String               @db.VarChar(100)
+  subject_specialization String?              @db.VarChar(100)
+  phone                  String?              @db.VarChar(50)
+  email                  String?              @db.VarChar(100)
+  note                   String?
+  branch_id              String?              @db.Uuid
+  librarytransaction     librarytransaction[]
+  branch                 branch?              @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  timetable              timetable[]
+}
+
+model term {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  branch_id    String?        @db.Uuid
+  name         String         @db.VarChar(100)
+  start_month  Int?
+  end_month    Int?
+  academicyear academicyear[]
+  assessment   assessment[]
+  branch       branch?        @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model timetable {
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  class_section_id String?       @db.Uuid
+  teacher_id       String?       @db.Uuid
+  day              day_enum
+  period           Int
+  note             String?
+  classsection     classsection? @relation(fields: [class_section_id], references: [id], onUpdate: NoAction)
+  teacher          teacher?      @relation(fields: [teacher_id], references: [id], onUpdate: NoAction)
+}
+
+enum attendance_status_enum {
+  Present
+  Absent
+  Excused
+}
+
+enum behavior_type_enum {
+  Positive
+  Negative
+}
+
+enum day_enum {
+  Mon
+  Tue
+  Wed
+  Thu
+  Fri
+  Sat
+  Sun
+}
+
+enum fee_status_enum {
+  Paid
+  Unpaid
+}
+
+enum fee_type_enum {
+  Tuition
+  Exam
+  Other
+}
+
+enum gender_enum {
+  Male
+  Female
+}
+
+enum leave_status_enum {
+  Pending
+  Approved
+  Rejected
+}
+
+enum parent_type_enum {
+  Mother
+  Father
+  Guardian
+}
+
+enum staff_role_enum {
+  Librarian
+  Accountant
+}
+
+enum term_status_enum {
+  Active
+  Inactive
 }

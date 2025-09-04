@@ -7,7 +7,7 @@
     "dev": "nodemon",
     "build": "tsc",
     "vercel-build": "echo hello",
-    "start": "node src/index.ts",
+    "start": "node src/server.ts",
     "lint": "eslint . --ext .ts,.js",
     "lint:fix": "eslint . -fix",
     "format": "prettier --write .",

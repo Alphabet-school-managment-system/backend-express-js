@@ -2,26 +2,26 @@ import express from "express";
 import cors from "cors";
 
 // Import routes
-import academicYearRoutes from "./routes/academicYear.route";
+import academicYearRoutes from "./routes/academic_year.route";
 import assessmentRoutes from "./routes/assessment.route";
 import attendanceRoutes from "./routes/attendance.route";
 import behaviorRoutes from "./routes/behavior.route";
 import branchRoutes from "./routes/branch.route";
-import classSectionRoutes from "./routes/classSection.route";
+import classSectionRoutes from "./routes/class_section.route";
 import enrollmentRoutes from "./routes/enrollment.route";
 import expenseRoutes from "./routes/expense.route";
 import feeRoutes from "./routes/fee.route";
-import financeSummaryRoutes from "./routes/financeSummary.route";
-import leaveRequestRoutes from "./routes/leaveRequest.route";
-import libraryBookRoutes from "./routes/libraryBook.route";
-import libraryTransactionRoutes from "./routes/libraryTransaction.route";
+import financeSummaryRoutes from "./routes/finance_summary.route";
+import leaveRequestRoutes from "./routes/leave_request.route";
+import libraryBookRoutes from "./routes/library_book.route";
+import libraryTransactionRoutes from "./routes/library_transaction.route";
 import markRoutes from "./routes/mark.route";
 import parentRoutes from "./routes/parent.route";
-import parentStudentsRoutes from "./routes/parentStudents.route";
+import parentStudentsRoutes from "./routes/parent_students.route";
 import schoolRoutes from "./routes/school.route";
 import staffRoutes from "./routes/staff.route";
 import studentRoutes from "./routes/student.route";
-import studentMarkSummaryRoutes from "./routes/studentMarkSummary.route";
+import studentMarkSummaryRoutes from "./routes/student_mark_summary.route";
 import teacherRoutes from "./routes/teacher.route";
 import termRoutes from "./routes/term.route";
 

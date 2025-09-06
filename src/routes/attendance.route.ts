@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { AttendanceController } from "../controllers/attendance.controller";
+import { attendanceSchema } from "../validators/attendance.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all attendances"));
-router.post("/", (req, res) => res.send("Create attendance"));
-
+const router = new BaseRouter(new AttendanceController(), attendanceSchema)
+  .router;
 export default router;

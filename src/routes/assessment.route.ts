@@ -1,8 +1,8 @@
-import { Router } from "express";
-const router = Router();
+import { assessmentSchema } from "../validators/assessment.schema";
+import { AssessmentController } from "../controllers/assessment.controller";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all assessments"));
-router.post("/", (req, res) => res.send("Create assessment"));
+const router = new BaseRouter(new AssessmentController(), assessmentSchema)
+  .router;
 
 export default router;

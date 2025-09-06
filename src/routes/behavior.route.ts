@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { behaviorSchema } from "../validators/behavior.schema";
+import { BehaviorController } from "../controllers/behavior.controller";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all behaviours"));
-router.post("/", (req, res) => res.send("Create behaviour"));
+const router = new BaseRouter(new BehaviorController(), behaviorSchema).router;
 
 export default router;

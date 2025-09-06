@@ -1,8 +1,8 @@
-import { Router } from "express";
-const router = Router();
+import { AcademicYearController } from "../controllers/academic_year.controller";
+import { academicYearSchema } from "../validators/academic_year.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all ays"));
-router.post("/", (req, res) => res.send("Create ay"));
+const router = new BaseRouter(new AcademicYearController(), academicYearSchema)
+  .router;
 
 export default router;

@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { BranchController } from "../controllers/branch.controller";
+import { branchSchema } from "../validators/branch.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all branchs"));
-router.post("/", (req, res) => res.send("Create branch"));
+const router = new BaseRouter(new BranchController(), branchSchema).router;
 
 export default router;

@@ -1,8 +1,8 @@
-import { Router } from "express";
-const router = Router();
+import { BaseRouter } from "./base.router";
+import { ClassSectionController } from "../controllers/class_section.controller";
+import { classSectionSchema } from "../validators/class_section.schema";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all classSections"));
-router.post("/", (req, res) => res.send("Create classSection"));
+const router = new BaseRouter(new ClassSectionController(), classSectionSchema)
+  .router;
 
 export default router;

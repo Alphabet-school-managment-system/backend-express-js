@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { Request } from "express";
 
 const prisma = new PrismaClient();
 
@@ -17,8 +18,25 @@ export class BaseRepository<
     return this.model.create({ data });
   }
 
-  async findAll() {
-    return this.model.findMany();
+  async findAll(req: Request) {
+    const { sort_by, sort_dir, limit } = req.query;
+
+    const orderBy = sort_by
+      ? {
+          [sort_by as string]: sort_dir
+            ? sort_dir === "desc"
+              ? "desc"
+              : "asc"
+            : "desc",
+        }
+      : undefined;
+
+    const take = limit ? parseInt(limit as string, 10) : 10;
+
+    return this.model.findMany({
+      orderBy,
+      take,
+    });
   }
 
   async findById(id: string) {

@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import z, { ZodObject } from "zod";
 import { validate } from "../middlewares/validate.middleware";
-
+import { authenticateToken } from "../middlewares/auth.middleware";
 type CRUDController = {
   create: (req: Request, res: Response) => Promise<any>;
   findAll: (req: Request, res: Response) => Promise<any>;
@@ -31,22 +31,30 @@ export class BaseRouter<T extends CRUDController> {
     this.router.post(
       "/",
       validate(schema),
+      authenticateToken,
       this.controller.create.bind(this.controller)
     );
     this.router.put(
       "/:id/update",
       validate(schema),
+      authenticateToken,
       this.controller.update.bind(this.controller)
     );
-    this.router.get("/", this.controller.findAll.bind(this.controller));
+    this.router.get(
+      "/",
+      authenticateToken,
+      this.controller.findAll.bind(this.controller)
+    );
     this.router.get(
       "/:id",
       validate(idSchema),
+      authenticateToken,
       this.controller.findOne.bind(this.controller)
     );
     this.router.delete(
       "/:id/delete",
       validate(idSchema),
+      authenticateToken,
       this.controller.delete.bind(this.controller)
     );
   }

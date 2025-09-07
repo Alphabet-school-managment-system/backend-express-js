@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 export class BaseService<TRepository> {
   protected repository: TRepository;
 
@@ -10,9 +12,9 @@ export class BaseService<TRepository> {
     return this.repository.create(data);
   }
 
-  async findAll() {
+  async findAll(req: Request) {
     // @ts-ignore
-    return this.repository.findAll();
+    return this.repository.findAll(req);
   }
 
   async findById(id: string) {

@@ -3,7 +3,7 @@ import { ZodObject } from "zod";
 
 type CRUDService = {
   create: (data: any) => Promise<any>;
-  findAll: () => Promise<any>;
+  findAll: (req: Request) => Promise<any>;
   findById: (id: string) => Promise<any>;
   update: (id: string, data: any) => Promise<any>;
   delete: (id: string) => Promise<void>;
@@ -30,7 +30,7 @@ export class BaseController<TService extends CRUDService> {
 
   async findAll(req: Request, res: Response) {
     try {
-      const result = await this.service.findAll();
+      const result = await this.service.findAll(req);
       res.json(result);
     } catch (error: any) {
       res.status(500).json({ error: error.message });

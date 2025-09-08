@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { TermController } from "../controllers/term.controller";
+import { termSchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all terms"));
-router.post("/", (req, res) => res.send("Create term"));
+const router = new BaseRouter(new TermController(), termSchema).router;
 
 export default router;

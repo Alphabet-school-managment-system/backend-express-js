@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { MarkController } from "../controllers/mark.controller";
+import { markSchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all marks"));
-router.post("/", (req, res) => res.send("Create mark"));
+const router = new BaseRouter(new MarkController(), markSchema).router;
 
 export default router;

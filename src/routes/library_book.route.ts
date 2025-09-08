@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { LibraryBookController } from "../controllers/library_book.controller";
+import { libraryBookSchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all library books"));
-router.post("/", (req, res) => res.send("Create library book"));
+const router = new BaseRouter(new LibraryBookController(), libraryBookSchema).router;
 
 export default router;

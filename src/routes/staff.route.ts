@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { StaffController } from "../controllers/staff.controller";
+import { staffSchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all staffs"));
-router.post("/", (req, res) => res.send("Create staff"));
+const router = new BaseRouter(new StaffController(), staffSchema).router;
 
 export default router;

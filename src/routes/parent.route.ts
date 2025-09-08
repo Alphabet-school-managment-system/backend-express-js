@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { ParentController } from "../controllers/parent.controller";
+import { parentSchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all parents"));
-router.post("/", (req, res) => res.send("Create parent"));
+const router = new BaseRouter(new ParentController(), parentSchema).router;
 
 export default router;

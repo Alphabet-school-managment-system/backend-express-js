@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { FinanceSummaryController } from "../controllers/finance_summary.controller";
+import { financeSummarySchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all finance summarys"));
-router.post("/", (req, res) => res.send("Create finance summary"));
+const router = new BaseRouter(new FinanceSummaryController(), financeSummarySchema).router;
 
 export default router;

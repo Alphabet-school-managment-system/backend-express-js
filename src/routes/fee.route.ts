@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { FeeController } from "../controllers/fee.controller";
+import { feeSchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all fees"));
-router.post("/", (req, res) => res.send("Create fee"));
+const router = new BaseRouter(new FeeController(), feeSchema).router;
 
 export default router;

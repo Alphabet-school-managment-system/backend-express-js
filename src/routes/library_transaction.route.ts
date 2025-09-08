@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { LibraryTransactionController } from "../controllers/library_transaction.controller";
+import { libraryTransactionSchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all library transactions"));
-router.post("/", (req, res) => res.send("Create library transaction"));
+const router = new BaseRouter(new LibraryTransactionController(), libraryTransactionSchema).router;
 
 export default router;

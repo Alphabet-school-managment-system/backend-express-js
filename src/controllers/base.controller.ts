@@ -9,18 +9,18 @@ type CRUDService = {
   delete: (id: string) => Promise<void>;
 };
 
-export class BaseController<TService extends CRUDService> {
+export class BaseController<TService extends CRUDService, TInput = any> {
   protected service: TService;
-  protected schema?: ZodObject;
+  protected schema?: ZodObject<any>;
 
-  constructor(service: TService, schema?: ZodObject) {
+  constructor(service: TService, schema?: ZodObject<any>) {
     this.service = service;
     this.schema = schema;
   }
 
   async create(req: Request, res: Response) {
     try {
-      const data = this.schema ? this.schema.parse(req.body) : req.body;
+      const data: TInput = this.schema ? this.schema.parse(req.body) : req.body;
       const result = await this.service.create(data);
       res.status(201).json(result);
     } catch (error: any) {

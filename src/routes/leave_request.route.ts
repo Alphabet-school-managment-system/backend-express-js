@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { LeaveRequestController } from "../controllers/leave_request.controller";
+import { leaveRequestSchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all leave requests"));
-router.post("/", (req, res) => res.send("Create leave request"));
+const router = new BaseRouter(new LeaveRequestController(), leaveRequestSchema).router;
 
 export default router;

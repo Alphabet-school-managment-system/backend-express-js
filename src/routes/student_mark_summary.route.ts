@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { StudentMarkSummaryController } from "../controllers/student_mark_summary.controller";
+import { studentMarkSummarySchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all student mark summarys"));
-router.post("/", (req, res) => res.send("Create student mark summary"));
+const router = new BaseRouter(new StudentMarkSummaryController(), studentMarkSummarySchema).router;
 
 export default router;

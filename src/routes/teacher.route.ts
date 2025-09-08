@@ -1,8 +1,7 @@
-import { Router } from "express";
-const router = Router();
+import { TeacherController } from "../controllers/teacher.controller";
+import { teacherSchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router";
 
-// Example endpoints
-router.get("/", (req, res) => res.send("Get all teachers"));
-router.post("/", (req, res) => res.send("Create teacher"));
+const router = new BaseRouter(new TeacherController(), teacherSchema).router;
 
 export default router;

@@ -1,5 +1,5 @@
 import { AttendanceService } from "../services/attendance.service";
-import { attendanceSchema } from "../validators/attendance.schema";
+import { attendanceSchema } from "../validators/zod.schema";
 
 import { BaseController } from "./base.controller";
 

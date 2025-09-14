@@ -1,5 +1,5 @@
 import { ClassSectionService } from "../services/class_section.service";
-import { classSectionSchema } from "../validators/class_section.schema";
+import { classSectionSchema } from "../validators/zod.schema";
 
 import { BaseController } from "./base.controller";
 

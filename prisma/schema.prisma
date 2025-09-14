@@ -350,6 +350,7 @@ enum parent_type_enum {
 enum staff_role_enum {
   Librarian
   Accountant
+  Admin
 }
 
 enum term_status_enum {

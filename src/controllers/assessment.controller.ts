@@ -1,5 +1,5 @@
 import { AssessmentService } from "../services/assessment.service";
-import { assessmentSchema } from "../validators/assessment.schema";
+import { assessmentSchema } from "../validators/zod.schema";
 
 import { BaseController } from "./base.controller";
 

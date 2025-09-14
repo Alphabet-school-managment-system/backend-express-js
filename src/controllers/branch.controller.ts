@@ -1,5 +1,5 @@
 import { BranchService } from "../services/branch.service";
-import { branchSchema } from "../validators/branch.schema";
+import { branchSchema } from "../validators/zod.schema";
 
 import { BaseController } from "./base.controller";
 

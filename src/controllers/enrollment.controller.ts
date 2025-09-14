@@ -1,5 +1,5 @@
 import { EnrollmentService } from "../services/enrollment.service";
-import { enrollmentSchema } from "../validators/enrollment.schema";
+import { enrollmentSchema } from "../validators/zod.schema";
 
 import { BaseController } from "./base.controller";
 

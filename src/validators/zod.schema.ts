@@ -1,5 +1,74 @@
 import z from "zod";
 
+// Enrollment
+export const enrollmentSchema = z.object({
+  student_id: z.string().uuid().optional().nullable(),
+  section_id: z.string().uuid().optional().nullable(),
+  academic_year_id: z.string().uuid().optional().nullable(),
+});
+
+export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
+
+// Class section
+export const classSectionSchema = z.object({
+  branch_id: z.string().uuid().optional().nullable(),
+  class_name: z.string().max(50).optional().nullable(),
+  section_name: z.string().max(50).optional().nullable(),
+});
+
+export type ClassSectionInput = z.infer<typeof classSectionSchema>;
+
+// Branch
+export const branchSchema = z.object({
+  school_id: z.string().uuid().optional().nullable(),
+  name: z.string().max(100),
+  location: z.string().max(255).optional().nullable(),
+});
+
+export type BranchInput = z.infer<typeof branchSchema>;
+
+// Behavior
+export const behaviorSchema = z.object({
+  student_id: z.string().uuid().optional().nullable(),
+  date: z.date().optional().nullable(),
+  description: z.string().optional().nullable(),
+  type: z.enum(["Positive", "Negative"]),
+});
+
+export type BehaviorInput = z.infer<typeof behaviorSchema>;
+
+// Attendance
+export const attendanceSchema = z.object({
+  student_id: z.string().uuid().optional().nullable(),
+  section_id: z.string().uuid().optional().nullable(),
+  date: z.date(),
+  status: z.enum(["Present", "Absent", "Excused"]),
+});
+
+export type AttendanceInput = z.infer<typeof attendanceSchema>;
+
+// Assessment
+export const assessmentSchema = z.object({
+  term_id: z.string().uuid().optional().nullable(),
+  section_id: z.string().uuid().optional().nullable(),
+  subject: z.string().max(100),
+  max_score: z.number().int(),
+});
+
+export type AssessmentInput = z.infer<typeof assessmentSchema>;
+// AcademicYear
+export const academicYearSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  name_local: z.string().min(1, "Local name is required"),
+  start_month: z.number().min(1).max(12),
+  end_month: z.number().min(1).max(12),
+  branch_id: z.string().uuid(),
+  term_id: z.string().uuid().optional(),
+  note: z.string().optional(),
+});
+
+export type AcademicYearInput = z.infer<typeof academicYearSchema>;
+
 // Expense
 export const expenseSchema = z.object({
   branch_id: z.string().uuid().optional().nullable(),
@@ -111,7 +180,7 @@ export const staffSchema = z.object({
   better_auth_id: z.string().uuid().optional().nullable(),
   first_name: z.string(),
   last_name: z.string(),
-  role: z.enum(["Librarian", "Accountant"]),
+  role: z.enum(["Librarian", "Accountant", "Admin"]),
   branch_id: z.string().uuid().optional().nullable(),
 });
 export type StaffInput = z.infer<typeof staffSchema>;

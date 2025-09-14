@@ -1,5 +1,5 @@
 import { BehaviorService } from "../services/behavior.service";
-import { behaviorSchema } from "../validators/behavior.schema";
+import { behaviorSchema } from "../validators/zod.schema";
 
 import { BaseController } from "./base.controller";
 

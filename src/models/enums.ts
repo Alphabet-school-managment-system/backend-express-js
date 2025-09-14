@@ -6,5 +6,5 @@ export type FeeType = "Tuition" | "Exam" | "Other";
 export type Gender = "Male" | "Female";
 export type LeaveStatus = "Pending" | "Approved" | "Rejected";
 export type ParentType = "Mother" | "Father" | "Guardian";
-export type StaffRole = "Librarian" | "Accountant";
+export type StaffRole = "Librarian" | "Accountant" | "Admin";
 export type TermStatus = "Active" | "Inactive";

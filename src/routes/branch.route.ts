@@ -1,5 +1,5 @@
 import { BranchController } from "../controllers/branch.controller";
-import { branchSchema } from "../validators/branch.schema";
+import { branchSchema } from "../validators/zod.schema";
 import { BaseRouter } from "./base.router";
 
 const router = new BaseRouter(new BranchController(), branchSchema).router;

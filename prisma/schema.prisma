@@ -188,14 +188,15 @@ model mark {
 
 model parent {
   id             String  @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
-  better_auth_id String? @db.Uuid
+  better_auth_id String @db.Uuid
   first_name     String  @db.VarChar(100)
   last_name      String  @db.VarChar(100)
-  phone          String? @db.VarChar(50)
-  email          String? @db.VarChar(100)
-  address        String?
+  phone          String @db.VarChar(50)
+  email          String @db.VarChar(100)
+  gender          gender_enum
+  address        String
   note           String?
-  branch_id      String? @db.Uuid
+  branch_id      String @db.Uuid
   studentRelations parentstudent[]
   branch         branch? @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
@@ -211,27 +212,31 @@ model school {
 
 model staff {
   id             String          @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
-  better_auth_id String?         @db.Uuid
+  better_auth_id String          @db.Uuid
   first_name     String          @db.VarChar(100)
   last_name      String          @db.VarChar(100)
+  phone          String @db.VarChar(50)
+  email          String @db.VarChar(100)
+  gender         gender_enum
   role           staff_role_enum
-  branch_id      String?         @db.Uuid
+  branch_id      String         @db.Uuid
   leaverequest   leaverequest[]
   branch         branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model student {
   id              String       @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
-  better_auth_id  String?      @db.Uuid
+  better_auth_id  String      @db.Uuid
   first_name      String       @db.VarChar(100)
   last_name       String       @db.VarChar(100)
-  full_name_local String?      @db.VarChar(200)
-  gender          gender_enum?
-  dob             DateTime?    @db.Date
-  address         String?
-  phone           String?      @db.VarChar(50)
+  full_name_local String      @db.VarChar(200)
+  gender          gender_enum
+  dob             DateTime    @db.Date
+  address         String
+  email           String @db.VarChar(100)
+  phone           String      @db.VarChar(50)
   note            String?
-  branch_id       String?      @db.Uuid
+  branch_id       String      @db.Uuid
   enrollment      enrollment[]
   parentRelations parentstudent[]
   branch          branch?      @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -253,16 +258,17 @@ model studentmarksummary {
 
 model teacher {
   id                     String               @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
-  better_auth_id         String?              @db.Uuid
+  better_auth_id         String              @db.Uuid
   first_name             String               @db.VarChar(100)
   last_name              String               @db.VarChar(100)
-  subject_specialization String?              @db.VarChar(100)
-  phone                  String?              @db.VarChar(50)
-  email                  String?              @db.VarChar(100)
+  subject_specialization String              @db.VarChar(100)
+  phone                  String              @db.VarChar(50)
+  email                  String              @db.VarChar(100)
+  gender                 gender_enum
   note                   String?
-  branch_id              String?              @db.Uuid
+  branch_id              String              @db.Uuid
   librarytransaction     librarytransaction[]
-  branch                 branch?              @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  branch                 branch              @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   timetable              timetable[]
 }
 

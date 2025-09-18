@@ -1,4 +1,4 @@
-import { assessmentSchema } from "../validators/assessment.schema";
+import { assessmentSchema } from "../validators/zod.schema";
 import { AssessmentController } from "../controllers/assessment.controller";
 import { BaseRouter } from "./base.router";
 

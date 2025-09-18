@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { Request } from "express";
 
 const prisma = new PrismaClient();
@@ -15,39 +15,62 @@ export class BaseRepository<
   }
 
   async create(data: TCreate) {
-    return this.model.create({ data });
+    try {
+      return await this.model.create({ data });
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   async findAll(req: Request) {
-    const { sort_by, sort_dir, limit } = req.query;
+    try {
+      const { sort_by, sort_dir, limit } = req.query;
 
-    const orderBy = sort_by
-      ? {
-          [sort_by as string]: sort_dir
-            ? sort_dir === "desc"
-              ? "desc"
-              : "asc"
-            : "desc",
-        }
-      : undefined;
+      const orderBy = sort_by
+        ? {
+            [sort_by as string]: sort_dir === "desc" ? "desc" : "asc",
+          }
+        : undefined;
 
-    const take = limit ? parseInt(limit as string, 10) : 10;
+      const take = limit ? parseInt(limit as string, 10) : 10;
 
-    return this.model.findMany({
-      orderBy,
-      take,
-    });
+      return await this.model.findMany({ orderBy, take });
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   async findById(id: string) {
-    return this.model.findUnique({ where: { id } });
+    try {
+      return await this.model.findUnique({ where: { id } });
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   async update(id: string, data: TUpdate) {
-    return this.model.update({ where: { id }, data });
+    try {
+      return await this.model.update({ where: { id }, data });
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   async delete(id: string) {
-    return this.model.delete({ where: { id } });
+    try {
+      return await this.model.delete({ where: { id: "" } });
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  private handleError(error: unknown): never {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new Error(
+        "An unexpected error occurred while doing operations with the database"
+      );
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
   }
 }

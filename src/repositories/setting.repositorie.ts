@@ -1,14 +1,14 @@
 import { BaseRepository } from "./base.repositorie";
 
-export class academicYearRepo extends BaseRepository<"academicyear"> {
+export class settingRepo extends BaseRepository<"setting"> {
   constructor() {
-    super("academicyear");
+    super("setting");
   }
 
-  async findById(branchId: string, signal?: AbortSignal) {
+  async findById(schoolId: string, signal?: AbortSignal) {
     try {
       return await this.model.findFirst({
-        where: { branch_id: branchId },
+        where: { school_id: schoolId },
         signal,
       });
     } catch (error) {

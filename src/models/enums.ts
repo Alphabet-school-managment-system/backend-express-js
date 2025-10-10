@@ -3,6 +3,7 @@ export type BehaviorType = "Positive" | "Negative";
 export type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 export type FeeStatus = "Paid" | "Unpaid";
 export type FeeType = "Tuition" | "Exam" | "Other";
+export type ExpenseType = "Salary" | "Rent" | "Other";
 export type Gender = "Male" | "Female";
 export type LeaveStatus = "Pending" | "Approved" | "Rejected";
 export type ParentType = "Mother" | "Father" | "Guardian";

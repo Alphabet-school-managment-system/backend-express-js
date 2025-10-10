@@ -21,13 +21,13 @@ export class BaseRouter<T extends CRUDController> {
   public router: Router;
   protected controller: T;
 
-  constructor(controller: T, schema: ZodObject) {
+  constructor(controller: T, schema?: ZodObject) {
     this.router = Router();
     this.controller = controller;
     this.initRoutes(schema);
   }
 
-  protected initRoutes(schema: ZodObject) {
+  protected initRoutes(schema?: ZodObject) {
     this.router.post(
       "/",
       validate(schema),

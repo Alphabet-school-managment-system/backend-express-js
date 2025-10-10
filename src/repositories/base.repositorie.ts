@@ -14,9 +14,9 @@ export class BaseRepository<
     this.model = (prisma as any)[model];
   }
 
-  async create(data: TCreate) {
+  async create(data: TCreate, signal?: AbortSignal) {
     try {
-      return await this.model.create({ data });
+      return await this.model.create({ data, signal });
     } catch (error) {
       this.handleError(error);
     }
@@ -34,42 +34,52 @@ export class BaseRepository<
 
       const take = limit ? parseInt(limit as string, 10) : 10;
 
-      return await this.model.findMany({ orderBy, take });
+      const queryOptions: any = { orderBy, take };
+
+      // Only use signal if it exists
+      const signal = (req as any).prismaSignal;
+
+      return await this.model.findMany(queryOptions, { signal });
     } catch (error) {
       this.handleError(error);
     }
   }
 
-  async findById(id: string) {
+  async findById(id: string, signal?: AbortSignal) {
     try {
-      return await this.model.findUnique({ where: { id } });
+      return await this.model.findUnique({ where: { id }, signal });
     } catch (error) {
       this.handleError(error);
     }
   }
 
-  async update(id: string, data: TUpdate) {
+  async update(id: string, data: TUpdate, signal?: AbortSignal) {
     try {
-      return await this.model.update({ where: { id }, data });
+      return await this.model.update({ where: { id }, data, signal });
     } catch (error) {
       this.handleError(error);
     }
   }
 
-  async delete(id: string) {
+  async delete(id: string, signal?: AbortSignal) {
     try {
-      return await this.model.delete({ where: { id: "" } });
+      return await this.model.delete({ where: { id }, signal });
     } catch (error) {
       this.handleError(error);
     }
   }
 
-  private handleError(error: unknown): never {
+  handleError(error: unknown): never {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       throw new Error(
         "An unexpected error occurred while doing operations with the database"
       );
     } else {
+      console.log(
+        "%csrc/repositories/base.repositorie.ts:78 error",
+        "color: #007acc;",
+        error
+      );
       throw new Error("An unexpected error occurred");
     }
   }

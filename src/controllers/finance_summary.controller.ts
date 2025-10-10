@@ -1,15 +1,9 @@
 import { FinanceSummaryService } from "../services/finance_summary.service";
-import {
-  financeSummarySchema,
-  FinanceSummaryInput,
-} from "../validators/zod.schema";
+
 import { BaseController } from "./base.controller";
 
-export class FinanceSummaryController extends BaseController<
-  FinanceSummaryService,
-  FinanceSummaryInput
-> {
+export class FinanceSummaryController extends BaseController<FinanceSummaryService> {
   constructor() {
-    super(new FinanceSummaryService(), financeSummarySchema);
+    super(new FinanceSummaryService());
   }
 }

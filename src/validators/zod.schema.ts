@@ -59,11 +59,15 @@ export type AttendanceInput = z.infer<typeof attendanceSchema>;
 
 // Assessment
 export const assessmentSchema = z.object({
-  term_id: z.string().uuid().optional().nullable(),
-  section_id: z.string().uuid().optional().nullable(),
+  term_id: z.string().uuid().nullable(),
+  section_ids: z.array(z.string().uuid()).min(1),
+  name: z.string().max(100).nullable(),
   subject: z.string().max(100),
   max_score: z.number().int(),
+  note: z.string().max(250).optional().nullable(),
+  teacher_id: z.string().uuid().nullable(),
 });
+
 export type AssessmentInput = z.infer<typeof assessmentSchema>;
 
 // AcademicYear
@@ -82,7 +86,9 @@ export const expenseSchema = z.object({
   branch_id: z.string().uuid().optional().nullable(),
   academic_year_id: z.string().uuid().optional().nullable(),
   description: z.string().optional().nullable(),
+  title: z.string(),
   amount: z.number(),
+  type: z.string(),
   date: z.string().optional().nullable(),
 });
 export type ExpenseInput = z.infer<typeof expenseSchema>;
@@ -98,19 +104,6 @@ export const feeSchema = z.object({
   note: z.string().optional().nullable(),
 });
 export type FeeInput = z.infer<typeof feeSchema>;
-
-// FinanceSummary
-export const financeSummarySchema = z.object({
-  full_name: z.string().optional().nullable(),
-  full_name_local: z.string().optional().nullable(),
-  gender: z.enum(["Male", "Female"]).optional().nullable(),
-  ay_name: z.string().optional().nullable(),
-  ay_name_local: z.string().optional().nullable(),
-  total_fee: z.number().optional().nullable(),
-  total_expense: z.number().optional().nullable(),
-  net_balance: z.number().optional().nullable(),
-});
-export type FinanceSummaryInput = z.infer<typeof financeSummarySchema>;
 
 // LeaveRequest
 export const leaveRequestSchema = z.object({
@@ -140,7 +133,6 @@ export const libraryTransactionSchema = z.object({
   issue_date: z.string().optional().nullable(),
   return_date: z.string().optional().nullable(),
   status: z.string().optional().nullable(),
-  islost: z.boolean().optional().nullable().default(false),
   note: z.string().optional().nullable(),
 });
 export type LibraryTransactionInput = z.infer<typeof libraryTransactionSchema>;
@@ -235,3 +227,14 @@ export const termSchema = z.object({
   end_month: z.number().int().optional().nullable(),
 });
 export type TermInput = z.infer<typeof termSchema>;
+
+export const settingSchema = z.object({
+  id: z.string().uuid().optional(),
+  number_of_terms: z.number().int(),
+  sections_per_class: z.number().int(),
+  levels_of_education: z.array(z.string()),
+  school_id: z.string().uuid(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+});
+export type SettingInput = z.infer<typeof settingSchema>;

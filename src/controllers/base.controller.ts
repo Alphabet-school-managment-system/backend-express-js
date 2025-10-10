@@ -40,7 +40,7 @@ export class BaseController<TService extends CRUDService, TInput = any> {
   async findOne(req: Request, res: Response) {
     try {
       const result = await this.service.findById(req.params.id);
-      if (!result) return res.status(404).json({ message: "Not found" });
+      // if (!result) return res.status(404).json({ message: "Not found" });
       res.json(result);
     } catch (error: any) {
       res.status(500).json({ error: error.message });

@@ -24,6 +24,7 @@ import studentRoutes from "./routes/student.route";
 import studentMarkSummaryRoutes from "./routes/student_mark_summary.route";
 import teacherRoutes from "./routes/teacher.route";
 import termRoutes from "./routes/term.route";
+import settingRoutes from "./routes/setting.route";
 import jwt from "jsonwebtoken";
 
 const app = express();
@@ -45,11 +46,23 @@ app.get("/get-token", (req, res) => {
   return res.json({ token });
 });
 
+// Middleware to attach AbortController signal to request
+app.use((req, res, next) => {
+  const controller = new AbortController();
+  (req as any).prismaSignal = controller.signal; // must be a real signal
+
+  req.on("close", () => {
+    controller.abort();
+  });
+
+  next();
+});
+
 app.use("/api/v1/academic-year", academicYearRoutes);
 app.use("/api/v1/assessment", assessmentRoutes);
 app.use("/api/v1/attendance", attendanceRoutes);
 app.use("/api/v1/behavior", behaviorRoutes);
-app.use("/api/v1/branche", branchRoutes);
+app.use("/api/v1/branch", branchRoutes);
 app.use("/api/v1/class-section", classSectionRoutes);
 app.use("/api/v1/enrollment", enrollmentRoutes);
 app.use("/api/v1/expense", expenseRoutes);
@@ -67,5 +80,6 @@ app.use("/api/v1/student", studentRoutes);
 app.use("/api/v1/student-mark-summarie", studentMarkSummaryRoutes);
 app.use("/api/v1/teacher", teacherRoutes);
 app.use("/api/v1/term", termRoutes);
+app.use("/api/v1/setting", settingRoutes);
 
 export default app;

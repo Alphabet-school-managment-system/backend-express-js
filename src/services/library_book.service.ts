@@ -1,5 +1,5 @@
-import { libraryBookRepo } from "../repositories/library_book.repositorie";
-import { BaseService } from "./base.service";
+import { libraryBookRepo } from "../repositories/library_book.repositorie.ts";
+import { BaseService } from "./base.service.ts";
 
 export class LibraryBookService extends BaseService<libraryBookRepo> {
   constructor() {

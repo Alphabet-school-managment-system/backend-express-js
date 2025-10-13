@@ -1,6 +1,6 @@
-import { BaseRouter } from "./base.router";
-import { ClassSectionController } from "../controllers/class_section.controller";
-import { classSectionSchema } from "../validators/zod.schema";
+import { BaseRouter } from "./base.router.ts";
+import { ClassSectionController } from "../controllers/class_section.controller.ts";
+import { classSectionSchema } from "../validators/zod.schema.ts";
 
 const router = new BaseRouter(new ClassSectionController(), classSectionSchema)
   .router;

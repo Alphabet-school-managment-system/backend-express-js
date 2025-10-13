@@ -76,7 +76,7 @@ export class BaseRepository<
       );
     } else {
       console.log(
-        "%csrc/repositories/base.repositorie.ts:78 error",
+        "%csrc/repositories/base.repositorie.ts.ts:78 error",
         "color: #007acc;",
         error
       );

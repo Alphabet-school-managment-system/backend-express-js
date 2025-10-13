@@ -1,5 +1,5 @@
-import { AssessmentRepository } from "../repositories/assessment.repositorie";
-import { BaseService } from "./base.service";
+import { AssessmentRepository } from "../repositories/assessment.repositorie.ts";
+import { BaseService } from "./base.service.ts";
 
 export class AssessmentService extends BaseService<AssessmentRepository> {
   constructor() {

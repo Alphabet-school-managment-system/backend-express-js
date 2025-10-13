@@ -1,7 +1,7 @@
-import { ClassSectionService } from "../services/class_section.service";
-import { classSectionSchema } from "../validators/zod.schema";
+import { ClassSectionService } from "../services/class_section.service.ts";
+import { classSectionSchema } from "../validators/zod.schema.ts";
 
-import { BaseController } from "./base.controller";
+import { BaseController } from "./base.controller.ts";
 
 export class ClassSectionController extends BaseController<ClassSectionService> {
   constructor() {

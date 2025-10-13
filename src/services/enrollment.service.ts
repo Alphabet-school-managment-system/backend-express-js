@@ -1,6 +1,6 @@
-import { EnrollmentRepository } from "../repositories/enrollment.repositorie";
+import { EnrollmentRepository } from "../repositories/enrollment.repositorie.ts";
 
-import { BaseService } from "./base.service";
+import { BaseService } from "./base.service.ts";
 
 export class EnrollmentService extends BaseService<EnrollmentRepository> {
   constructor() {

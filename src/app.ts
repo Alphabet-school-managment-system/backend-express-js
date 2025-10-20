@@ -27,13 +27,21 @@ import termRoutes from "./routes/term.route.ts";
 import settingRoutes from "./routes/setting.route.ts";
 import jwt from "jsonwebtoken";
 
-import { toNodeHandler } from 'better-auth/node';
-import { auth } from './lib/auth.ts';
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth.ts";
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+
 app.use(express.json());
+
+app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -61,31 +69,47 @@ app.use((req, res, next) => {
   next();
 });
 
-app.all("/api/auth/*splat", toNodeHandler(auth));
+app.post("/signup", async (req, res) => {
+  const { email, password, name } = req.body;
 
+  try {
+    const { headers, response } = await auth.api.signUpEmail({
+      returnHeaders: true,
+      body: {
+        email: email,
+        password: password,
+        name: name,
+      },
+    });
+
+    res.status(201).json({ message: "User created", response });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 app.use("/api/v1/academic-year", academicYearRoutes);
-// app.use("/api/v1/assessment", assessmentRoutes);
-// app.use("/api/v1/attendance", attendanceRoutes);
-// app.use("/api/v1/behavior", behaviorRoutes);
-// app.use("/api/v1/branch", branchRoutes);
-// app.use("/api/v1/class-section", classSectionRoutes);
-// app.use("/api/v1/enrollment", enrollmentRoutes);
-// app.use("/api/v1/expense", expenseRoutes);
-// app.use("/api/v1/fee", feeRoutes);
-// app.use("/api/v1/finance-summarie", financeSummaryRoutes);
-// app.use("/api/v1/leave-request", leaveRequestRoutes);
-// app.use("/api/v1/library-book", libraryBookRoutes);
-// app.use("/api/v1/library-transaction", libraryTransactionRoutes);
-// app.use("/api/v1/mark", markRoutes);
-// app.use("/api/v1/parent", parentRoutes);
-// app.use("/api/v1/parent-student", parentStudentsRoutes);
-// app.use("/api/v1/school", schoolRoutes);
-// app.use("/api/v1/staff", staffRoutes);
-// app.use("/api/v1/student", studentRoutes);
-// app.use("/api/v1/student-mark-summarie", studentMarkSummaryRoutes);
-// app.use("/api/v1/teacher", teacherRoutes);
-// app.use("/api/v1/term", termRoutes);
-// app.use("/api/v1/setting", settingRoutes);
+app.use("/api/v1/assessment", assessmentRoutes);
+app.use("/api/v1/attendance", attendanceRoutes);
+app.use("/api/v1/behavior", behaviorRoutes);
+app.use("/api/v1/branch", branchRoutes);
+app.use("/api/v1/class-section", classSectionRoutes);
+app.use("/api/v1/enrollment", enrollmentRoutes);
+app.use("/api/v1/expense", expenseRoutes);
+app.use("/api/v1/fee", feeRoutes);
+app.use("/api/v1/finance-summarie", financeSummaryRoutes);
+app.use("/api/v1/leave-request", leaveRequestRoutes);
+app.use("/api/v1/library-book", libraryBookRoutes);
+app.use("/api/v1/library-transaction", libraryTransactionRoutes);
+app.use("/api/v1/mark", markRoutes);
+app.use("/api/v1/parent", parentRoutes);
+app.use("/api/v1/parent-student", parentStudentsRoutes);
+app.use("/api/v1/school", schoolRoutes);
+app.use("/api/v1/staff", staffRoutes);
+app.use("/api/v1/student", studentRoutes);
+app.use("/api/v1/student-mark-summarie", studentMarkSummaryRoutes);
+app.use("/api/v1/teacher", teacherRoutes);
+app.use("/api/v1/term", termRoutes);
+app.use("/api/v1/setting", settingRoutes);
 
 export default app;

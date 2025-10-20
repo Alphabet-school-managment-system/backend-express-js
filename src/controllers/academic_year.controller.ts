@@ -1,6 +1,6 @@
-import { AcademicYearService } from "../services/academic_year.service";
-import { academicYearSchema } from "../validators/zod.schema";
-import { BaseController } from "./base.controller";
+import { AcademicYearService } from "../services/academic_year.service.ts";
+import { academicYearSchema } from "../validators/zod.schema.ts";
+import { BaseController } from "./base.controller.ts";
 
 export class AcademicYearController extends BaseController<AcademicYearService> {
   constructor() {

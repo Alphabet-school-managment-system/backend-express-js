@@ -1,6 +1,6 @@
-import { LibraryBookController } from "../controllers/library_book.controller";
-import { libraryBookSchema } from "../validators/zod.schema";
-import { BaseRouter } from "./base.router";
+import { LibraryBookController } from "../controllers/library_book.controller.ts";
+import { libraryBookSchema } from "../validators/zod.schema.ts";
+import { BaseRouter } from "./base.router.ts";
 
 const router = new BaseRouter(new LibraryBookController(), libraryBookSchema).router;
 

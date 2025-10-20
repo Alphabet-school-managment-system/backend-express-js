@@ -1,7 +1,7 @@
-import { BranchService } from "../services/branch.service";
-import { branchSchema } from "../validators/zod.schema";
+import { BranchService } from "../services/branch.service.ts";
+import { branchSchema } from "../validators/zod.schema.ts";
 
-import { BaseController } from "./base.controller";
+import { BaseController } from "./base.controller.ts";
 
 export class BranchController extends BaseController<BranchService> {
   constructor() {

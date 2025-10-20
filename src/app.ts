@@ -2,35 +2,46 @@ import express from "express";
 import cors from "cors";
 
 // Import routes
-import academicYearRoutes from "./routes/academic_year.route";
-import assessmentRoutes from "./routes/assessment.route";
-import attendanceRoutes from "./routes/attendance.route";
-import behaviorRoutes from "./routes/behavior.route";
-import branchRoutes from "./routes/branch.route";
-import classSectionRoutes from "./routes/class_section.route";
-import enrollmentRoutes from "./routes/enrollment.route";
-import expenseRoutes from "./routes/expense.route";
-import feeRoutes from "./routes/fee.route";
-import financeSummaryRoutes from "./routes/finance_summary.route";
-import leaveRequestRoutes from "./routes/leave_request.route";
-import libraryBookRoutes from "./routes/library_book.route";
-import libraryTransactionRoutes from "./routes/library_transaction.route";
-import markRoutes from "./routes/mark.route";
-import parentRoutes from "./routes/parent.route";
-import parentStudentsRoutes from "./routes/parent_student.route";
-import schoolRoutes from "./routes/school.route";
-import staffRoutes from "./routes/staff.route";
-import studentRoutes from "./routes/student.route";
-import studentMarkSummaryRoutes from "./routes/student_mark_summary.route";
-import teacherRoutes from "./routes/teacher.route";
-import termRoutes from "./routes/term.route";
-import settingRoutes from "./routes/setting.route";
+import academicYearRoutes from "./routes/academic_year.route.ts";
+import assessmentRoutes from "./routes/assessment.route.ts";
+import attendanceRoutes from "./routes/attendance.route.ts";
+import behaviorRoutes from "./routes/behavior.route.ts";
+import branchRoutes from "./routes/branch.route.ts";
+import classSectionRoutes from "./routes/class_section.route.ts";
+import enrollmentRoutes from "./routes/enrollment.route.ts";
+import expenseRoutes from "./routes/expense.route.ts";
+import feeRoutes from "./routes/fee.route.ts";
+import financeSummaryRoutes from "./routes/finance_summary.route.ts";
+import leaveRequestRoutes from "./routes/leave_request.route.ts";
+import libraryBookRoutes from "./routes/library_book.route.ts";
+import libraryTransactionRoutes from "./routes/library_transaction.route.ts";
+import markRoutes from "./routes/mark.route.ts";
+import parentRoutes from "./routes/parent.route.ts";
+import parentStudentsRoutes from "./routes/parent_student.route.ts";
+import schoolRoutes from "./routes/school.route.ts";
+import staffRoutes from "./routes/staff.route.ts";
+import studentRoutes from "./routes/student.route.ts";
+import studentMarkSummaryRoutes from "./routes/student_mark_summary.route.ts";
+import teacherRoutes from "./routes/teacher.route.ts";
+import termRoutes from "./routes/term.route.ts";
+import settingRoutes from "./routes/setting.route.ts";
 import jwt from "jsonwebtoken";
+
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth.ts";
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+
 app.use(express.json());
+
+app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -56,6 +67,25 @@ app.use((req, res, next) => {
   });
 
   next();
+});
+
+app.post("/signup", async (req, res) => {
+  const { email, password, name } = req.body;
+
+  try {
+    const { headers, response } = await auth.api.signUpEmail({
+      returnHeaders: true,
+      body: {
+        email: email,
+        password: password,
+        name: name,
+      },
+    });
+
+    res.status(201).json({ message: "User created", response });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 app.use("/api/v1/academic-year", academicYearRoutes);

@@ -1,6 +1,6 @@
-import { BranchController } from "../controllers/branch.controller";
-import { branchSchema } from "../validators/zod.schema";
-import { BaseRouter } from "./base.router";
+import { BranchController } from "../controllers/branch.controller.ts";
+import { branchSchema } from "../validators/zod.schema.ts";
+import { BaseRouter } from "./base.router.ts";
 
 const router = new BaseRouter(new BranchController(), branchSchema).router;
 

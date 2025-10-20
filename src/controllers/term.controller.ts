@@ -1,6 +1,6 @@
-import { TermService } from "../services/term.service";
-import { termSchema, TermInput } from "../validators/zod.schema";
-import { BaseController } from "./base.controller";
+import { TermService } from "../services/term.service.ts";
+import { termSchema, TermInput } from "../validators/zod.schema.ts";
+import { BaseController } from "./base.controller.ts";
 
 export class TermController extends BaseController<
   TermService,

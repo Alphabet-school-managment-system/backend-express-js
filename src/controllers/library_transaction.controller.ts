@@ -1,9 +1,9 @@
-import { LibraryTransactionService } from "../services/library_transaction.service";
+import { LibraryTransactionService } from "../services/library_transaction.service.ts";
 import {
   libraryTransactionSchema,
   LibraryTransactionInput,
-} from "../validators/zod.schema";
-import { BaseController } from "./base.controller";
+} from "../validators/zod.schema.ts";
+import { BaseController } from "./base.controller.ts";
 
 export class LibraryTransactionController extends BaseController<
   LibraryTransactionService,

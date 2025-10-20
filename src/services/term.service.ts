@@ -1,5 +1,5 @@
-import { termRepo } from "../repositories/term.repositorie";
-import { BaseService } from "./base.service";
+import { termRepo } from "../repositories/term.repositorie.ts";
+import { BaseService } from "./base.service.ts";
 
 export class TermService extends BaseService<termRepo> {
   constructor() {

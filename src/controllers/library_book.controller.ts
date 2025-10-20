@@ -1,9 +1,9 @@
-import { LibraryBookService } from "../services/library_book.service";
+import { LibraryBookService } from "../services/library_book.service.ts";
 import {
   libraryBookSchema,
   LibraryBookInput,
-} from "../validators/zod.schema";
-import { BaseController } from "./base.controller";
+} from "../validators/zod.schema.ts";
+import { BaseController } from "./base.controller.ts";
 
 export class LibraryBookController extends BaseController<
   LibraryBookService,

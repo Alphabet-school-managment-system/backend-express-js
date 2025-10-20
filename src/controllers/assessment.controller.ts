@@ -1,7 +1,7 @@
-import { AssessmentService } from "../services/assessment.service";
-import { assessmentSchema } from "../validators/zod.schema";
+import { AssessmentService } from "../services/assessment.service.ts";
+import { assessmentSchema } from "../validators/zod.schema.ts";
 
-import { BaseController } from "./base.controller";
+import { BaseController } from "./base.controller.ts";
 
 export class AssessmentController extends BaseController<AssessmentService> {
   constructor() {

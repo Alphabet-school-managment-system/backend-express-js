@@ -25,6 +25,8 @@ import studentMarkSummaryRoutes from "./routes/student_mark_summary.route.ts";
 import teacherRoutes from "./routes/teacher.route.ts";
 import termRoutes from "./routes/term.route.ts";
 import settingRoutes from "./routes/setting.route.ts";
+import authRoutes from "./routes/auth.route.ts";
+
 import jwt from "jsonwebtoken";
 
 import { toNodeHandler } from "better-auth/node";
@@ -69,28 +71,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post("/signup", async (req, res) => {
-  const { email, password, name } = req.body;
-
-  try {
-    const { headers, response } = await auth.api.signUpEmail({
-      returnHeaders: true,
-      body: {
-        email: email,
-        password: password,
-        name: name,
-      },
-    });
-
-    res.status(201).json({ message: "User created", response });
-  } catch (err: any) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/academic-year", academicYearRoutes);
 app.use("/api/v1/assessment", assessmentRoutes);
-app.use("/api/v1/attendance", attendanceRoutes);
+app.use("/api/v1/attendance", attendanceRoutes);authRoutes
 app.use("/api/v1/behavior", behaviorRoutes);
 app.use("/api/v1/branch", branchRoutes);
 app.use("/api/v1/class-section", classSectionRoutes);

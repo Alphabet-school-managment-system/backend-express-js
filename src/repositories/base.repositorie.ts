@@ -1,7 +1,7 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { Request } from "express";
 
-const prisma = new PrismaClient();
+export const prisma = new PrismaClient();
 
 export class BaseRepository<
   TModel extends keyof PrismaClient,
@@ -11,7 +11,7 @@ export class BaseRepository<
   protected model: any;
 
   constructor(model: TModel) {
-    this.model = (prisma as any)[model];
+    this.model = (prisma as any)[model]; 
   }
 
   async create(data: TCreate, signal?: AbortSignal) {
@@ -75,12 +75,15 @@ export class BaseRepository<
         "An unexpected error occurred while doing operations with the database"
       );
     } else {
-      console.log(
-        "%csrc/repositories/base.repositorie.ts.ts:78 error",
-        "color: #007acc;",
-        error
-      );
       throw new Error("An unexpected error occurred");
     }
   }
 }
+
+export const handleError = (error: unknown): string => {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    return "An unexpected error occurred while doing operations with the database";
+  } else {
+    return "An unexpected error occurred";
+  }
+};

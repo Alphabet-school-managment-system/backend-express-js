@@ -1,5 +1,19 @@
 import z from "zod";
 
+export enum Staff_Role_Enum {
+  Librarian = "Librarian",
+  Accountant = "Accountant",
+  Admin = "Admin",
+}
+
+export const signupSchema = z.object({
+  first_name: z.string(),
+  last_name: z.string(),
+  email: z.string().max(100),
+  password: z.string().min(5).max(12),
+  school_name: z.string().max(50),
+});
+
 // StudentMarkSummary
 export const studentMarkSummarySchema = z.object({
   full_name: z.string().optional().nullable(),

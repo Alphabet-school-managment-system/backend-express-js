@@ -11,7 +11,7 @@ export class BaseRepository<
   protected model: any;
 
   constructor(model: TModel) {
-    this.model = (prisma as any)[model]; 
+    this.model = (prisma as any)[model];
   }
 
   async create(data: TCreate, signal?: AbortSignal) {
@@ -64,6 +64,38 @@ export class BaseRepository<
   async delete(id: string, signal?: AbortSignal) {
     try {
       return await this.model.delete({ where: { id }, signal });
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async search(req: Request) {
+    try {
+      const query = req.query;
+      const filters: any[] = [];
+
+      // loop over each query key dynamically
+      for (const [key, value] of Object.entries(query)) {
+        if (value && typeof value === "string") {
+          filters.push({
+            [key]: {
+              contains: value,
+              mode: "insensitive",
+            },
+          });
+        }
+      }
+
+      const queryOptions: any = {
+        where: {
+          OR: filters,
+        },
+      };
+
+      // Only use signal if it exists
+      const signal = (req as any).prismaSignal;
+
+      return await this.model.findMany(queryOptions, { signal });
     } catch (error) {
       this.handleError(error);
     }

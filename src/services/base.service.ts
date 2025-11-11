@@ -31,4 +31,9 @@ export class BaseService<TRepository> {
     // @ts-ignore
     return this.repository.delete(id);
   }
+
+   async search(req: Request) {
+    // @ts-ignore
+    return this.repository.search(req);
+  }
 }

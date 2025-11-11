@@ -1,7 +1,7 @@
 import { BaseRepository } from "./base.repositorie.ts";
 
-export class libraryTransactionRepo extends BaseRepository<"librarybook"> {
+export class libraryTransactionRepo extends BaseRepository<"librarytransaction"> {
   constructor() {
-    super("librarybook");
+    super("librarytransaction");
   }
 }

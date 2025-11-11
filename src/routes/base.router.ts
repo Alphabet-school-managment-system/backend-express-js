@@ -8,6 +8,7 @@ type CRUDController = {
   findOne: (req: Request, res: Response) => Promise<any>;
   update: (req: Request, res: Response) => Promise<any>;
   delete: (req: Request, res: Response) => Promise<any>;
+  search: (req: Request, res: Response) => Promise<any>;
 };
 
 export const idSchema = z.object({
@@ -44,6 +45,11 @@ export class BaseRouter<T extends CRUDController> {
       "/",
       authenticateToken,
       this.controller.findAll.bind(this.controller)
+    );
+    this.router.get(
+      "/search",
+      authenticateToken,
+      this.controller.search.bind(this.controller)
     );
     this.router.get(
       "/:id",

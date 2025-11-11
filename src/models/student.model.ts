@@ -1,4 +1,4 @@
-import { Gender } from "./enums";
+import { Gender } from "./enums.ts";
 
 export interface Student {
   _id: string;

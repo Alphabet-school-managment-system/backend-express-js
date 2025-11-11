@@ -7,6 +7,7 @@ type CRUDService = {
   findById: (id: string) => Promise<any>;
   update: (id: string, data: any) => Promise<any>;
   delete: (id: string) => Promise<void>;
+  search: (req: Request) => Promise<any>;
 };
 
 export class BaseController<TService extends CRUDService, TInput = any> {
@@ -63,6 +64,15 @@ export class BaseController<TService extends CRUDService, TInput = any> {
       res.status(204).send();
     } catch (error: any) {
       res.status(400).json({ error: error.message });
+    }
+  }
+
+   async search(req: Request, res: Response) {
+    try {
+      const result = await this.service.search(req);
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   }
 }

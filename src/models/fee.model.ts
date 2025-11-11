@@ -1,4 +1,4 @@
-import { FeeStatus, FeeType } from "./enums";
+import { FeeStatus, FeeType } from "./enums.ts";
 
 export interface Fee {
   _id: string;

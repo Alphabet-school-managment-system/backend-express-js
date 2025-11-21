@@ -26,6 +26,7 @@ import teacherRoutes from "./routes/teacher.route.ts";
 import termRoutes from "./routes/term.route.ts";
 import settingRoutes from "./routes/setting.route.ts";
 import authRoutes from "./routes/auth.route.ts";
+import dashboardRoutes from "./routes/dashboard.route.ts";
 
 import jwt from "jsonwebtoken";
 
@@ -72,9 +73,11 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/academic-year", academicYearRoutes);
 app.use("/api/v1/assessment", assessmentRoutes);
-app.use("/api/v1/attendance", attendanceRoutes);authRoutes
+app.use("/api/v1/attendance", attendanceRoutes);
+authRoutes;
 app.use("/api/v1/behavior", behaviorRoutes);
 app.use("/api/v1/branch", branchRoutes);
 app.use("/api/v1/class-section", classSectionRoutes);

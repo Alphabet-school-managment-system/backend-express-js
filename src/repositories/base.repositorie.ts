@@ -24,22 +24,37 @@ export class BaseRepository<
 
   async findAll(req: Request) {
     try {
-      const { sort_by, sort_dir, limit } = req.query;
+      const {
+        sort_by,
+        sort_dir,
+        limit,
+        branch_id: bi,
+        academic_year_id: ay,
+        school_id: si,
+      } = req.query;
 
       const orderBy = sort_by
-        ? {
-            [sort_by as string]: sort_dir === "desc" ? "desc" : "asc",
-          }
+        ? { [sort_by as string]: sort_dir === "desc" ? "desc" : "asc" }
         : undefined;
 
       const take = limit ? parseInt(limit as string, 10) : 10;
 
-      const queryOptions: any = { orderBy, take };
+      const where: any = {
+        ...(ay && { academic_year_id: ay }),
+        ...(bi && { branch_id: bi }),
+        ...(si && { school_id: si }),
+      };
 
-      // Only use signal if it exists
       const signal = (req as any).prismaSignal;
 
-      return await this.model.findMany(queryOptions, { signal });
+      return await this.model.findMany(
+        {
+          where,
+          orderBy,
+          take,
+        },
+        { signal }
+      );
     } catch (error) {
       this.handleError(error);
     }

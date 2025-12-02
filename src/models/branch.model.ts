@@ -3,4 +3,5 @@ export interface Branch {
   school_id?: string | null;
   name: string;
   location?: string | null;
+  current?: boolean | false;
 }

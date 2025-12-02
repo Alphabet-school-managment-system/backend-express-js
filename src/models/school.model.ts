@@ -4,4 +4,5 @@ export interface School {
   address: string | null;
   contact: string | null;
   note?: string | null;
+  better_auth_id?: string | null;
 }

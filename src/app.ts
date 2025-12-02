@@ -63,7 +63,7 @@ app.get("/get-token", (req, res) => {
 // Middleware to attach AbortController signal to request
 app.use((req, res, next) => {
   const controller = new AbortController();
-  (req as any).prismaSignal = controller.signal; // must be a real signal
+  (req as any).prismaSignal = controller.signal;
 
   req.on("close", () => {
     controller.abort();
@@ -77,7 +77,6 @@ app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/academic-year", academicYearRoutes);
 app.use("/api/v1/assessment", assessmentRoutes);
 app.use("/api/v1/attendance", attendanceRoutes);
-authRoutes;
 app.use("/api/v1/behavior", behaviorRoutes);
 app.use("/api/v1/branch", branchRoutes);
 app.use("/api/v1/class-section", classSectionRoutes);

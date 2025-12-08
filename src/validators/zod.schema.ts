@@ -1,9 +1,89 @@
 import z from "zod";
 
-export enum Staff_Role_Enum {
+// Enums
+export enum AttendanceStatus {
+  Present = "Present",
+  Absent = "Absent",
+  Excused = "Excused",
+}
+
+export enum BehaviorType {
+  Positive = "Positive",
+  Negative = "Negative",
+}
+
+export enum Day {
+  Mon = "Mon",
+  Tue = "Tue",
+  Wed = "Wed",
+  Thu = "Thu",
+  Fri = "Fri",
+  Sat = "Sat",
+  Sun = "Sun",
+}
+
+export enum FeeStatus {
+  Paid = "Paid",
+  Unpaid = "Unpaid",
+}
+
+export enum FeeType {
+  Tuition = "Tuition",
+  Exam = "Exam",
+  Other = "Other",
+}
+
+export enum ExpenseType {
+  Salary = "Salary",
+  Rent = "Rent",
+  Other = "Other",
+}
+
+export enum Sex {
+  Male = "Male",
+  Female = "Female",
+}
+
+export enum LeaveStatus {
+  Pending = "Pending",
+  Approved = "Approved",
+  Rejected = "Rejected",
+}
+
+export enum ParentType {
+  Mother = "Mother",
+  Father = "Father",
+  Brother = "Brother",
+  Sister = "Sister",
+  Aunt = "Aunt",
+  Uncle = "Uncle",
+  Guardian = "Guardian",
+  Other = "Other",
+}
+
+export enum StaffRole {
   Librarian = "Librarian",
   Accountant = "Accountant",
   Admin = "Admin",
+}
+
+export enum LibraryItemType {
+  BOOK = "BOOK",
+  MAGAZINE = "MAGAZINE",
+  JOURNAL = "JOURNAL",
+  E_BOOK = "E_BOOK",
+  AUDIO_BOOK = "AUDIO_BOOK",
+  REFERENCE_BOOK = "REFERENCE_BOOK",
+  OTHER = "OTHER",
+}
+
+export enum BorrowStatus {
+  RETURNED = "RETURNED",
+  BORROWED = "BORROWED",
+  RESERVED = "RESERVED",
+  OVERDUE = "OVERDUE",
+  LOST = "LOST",
+  DAMAGED = "DAMAGED",
 }
 
 export const signupSchema = z.object({
@@ -14,241 +94,423 @@ export const signupSchema = z.object({
   school_name: z.string().max(50),
 });
 
-// StudentMarkSummary
-export const studentMarkSummarySchema = z.object({
-  full_name: z.string().optional().nullable(),
-  full_name_local: z.string().optional().nullable(),
-  gender: z.enum(["Male", "Female"]).optional().nullable(),
-  ay_name: z.string().optional().nullable(),
-  ay_name_local: z.string().optional().nullable(),
-  subject: z.string().optional().nullable(),
-  total_score: z.number().optional().nullable(),
-  average_score: z.number().optional().nullable(),
-});
-export type StudentMarkSummaryInput = z.infer<typeof studentMarkSummarySchema>;
+export type SignupInput = z.infer<typeof signupSchema>;
 
-// Enrollment
-export const enrollmentSchema = z.object({
-  student_id: z.string().uuid().optional().nullable(),
-  section_id: z.string().uuid().optional().nullable(),
-  academic_year_id: z.string().uuid().optional().nullable(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
-});
-export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
-
-// ClassSection
-export const classSectionSchema = z.object({
-  branch_id: z.string().uuid().optional().nullable(),
-  class_name: z.string().max(50).optional().nullable(),
-  section_name: z.string().max(50).optional().nullable(),
-});
-export type ClassSectionInput = z.infer<typeof classSectionSchema>;
-
-// Branch
-export const branchSchema = z.object({
-  school_id: z.string().uuid().optional().nullable(),
+export const academicYearSchema = z.object({
+  id: z.string().uuid(),
+  branch_id: z.string().uuid(),
   name: z.string().max(100),
-  location: z.string().max(255).optional().nullable(),
+  name_local: z.string().max(100),
+  start_date: z.coerce.date(),
+  end_date: z.coerce.date(),
+  enrollment_start: z.coerce.date(),
+  enrollment_end: z.coerce.date(),
+  created_at: z.coerce.date().nullable().optional(),
+  updated_at: z.coerce.date().nullable().optional(),
 });
-export type BranchInput = z.infer<typeof branchSchema>;
 
-// Behavior
-export const behaviorSchema = z.object({
-  student_id: z.string().uuid().optional().nullable(),
-  date: z.string().optional().nullable(),
-  description: z.string().optional().nullable(),
-  type: z.enum(["Positive", "Negative"]),
+const createAcademicYearSchema = academicYearSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
 });
-export type BehaviorInput = z.infer<typeof behaviorSchema>;
 
-// Attendance
-export const attendanceSchema = z.object({
-  student_id: z.string().uuid().optional().nullable(),
-  section_id: z.string().uuid().optional().nullable(),
-  date: z.string(),
-  status: z.enum(["Present", "Absent", "Excused"]),
-});
-export type AttendanceInput = z.infer<typeof attendanceSchema>;
+export type AcademicYearInput = z.infer<typeof createAcademicYearSchema>;
 
-// Assessment
 export const assessmentSchema = z.object({
-  term_id: z.string().uuid().nullable(),
-  section_ids: z.array(z.string().uuid()).min(1),
-  name: z.string().max(100).nullable(),
+  id: z.string().uuid(),
+  title: z.string().max(100),
+  term: z.string().max(100),
   subject: z.string().max(100),
   max_score: z.number().int(),
-  note: z.string().max(250).optional().nullable(),
-  teacher_id: z.string().uuid().nullable(),
+  note: z.string().max(250).nullable().optional(),
+  teacher_id: z.string().uuid().nullable().optional(),
+  created_at: z.coerce.date().nullable().optional(),
+  updated_at: z.coerce.date().nullable().optional(),
 });
 
-export type AssessmentInput = z.infer<typeof assessmentSchema>;
+const createAssessmentSchema = assessmentSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
 
-// AcademicYear
-export const academicYearSchema = z.object({
+export type AssessmentInput = z.infer<typeof createAssessmentSchema>;
+
+export const attendanceSchema = z.object({
+  id: z.string().uuid(),
+  academic_year_id: z.string().uuid(),
+  term: z.string().max(100),
+  class: z.string().max(100),
+  section: z.string().max(100),
+  student_id: z.string().uuid(),
+  date: z.coerce.date(),
+  created_at: z.coerce.date().nullable().optional(),
+  updated_at: z.coerce.date().nullable().optional(),
+  status: z.nativeEnum(AttendanceStatus),
+});
+
+const createAttendanceSchema = attendanceSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+export type AttendanceInput = z.infer<typeof createAttendanceSchema>;
+
+export const behaviorSchema = z.object({
+  id: z.string().uuid(),
+  academic_year_id: z.string().uuid(),
+  term: z.string().max(100),
+  student_id: z.string().uuid(),
+  date: z.coerce.date(),
+  description: z.string().nullable().optional(),
+  type: z.nativeEnum(BehaviorType),
+  branchId: z.string().uuid().nullable().optional(),
+});
+
+const createBehaviorSchema = behaviorSchema.omit({
+  id: true,
+});
+
+export type BehaviorInput = z.infer<typeof createBehaviorSchema>;
+
+export const branchSchema = z.object({
+  id: z.string().uuid(),
+  school_id: z.string().uuid(),
   name: z.string().max(100),
-  name_local: z.string().max(100).optional().nullable(),
-  start_date: z.string().optional().nullable(),
-  end_date: z.string().optional().nullable(),
-  branch_id: z.string().uuid().optional().nullable(),
-  term_id: z.string().uuid().optional().nullable(),
+  location: z.string().max(255).nullable().optional(),
+  isCurrent: z.boolean().optional(),
+  isDefault: z.boolean().optional(),
 });
-export type AcademicYearInput = z.infer<typeof academicYearSchema>;
 
-// Expense
+const createBranchSchema = branchSchema.omit({
+  id: true,
+});
+
+export type BranchInput = z.infer<typeof createBranchSchema>;
+
+export const enrollmentSchema = z.object({
+  id: z.string().uuid(),
+  academic_year_id: z.string().uuid(),
+  student_id: z.string().uuid(),
+  class: z.string().max(100),
+  section: z.string().max(100).nullable().optional(),
+  isTransferred: z.boolean().nullable().optional(),
+  transferredFrom: z.string().max(100).nullable().optional(),
+  note: z.string().max(255).nullable().optional(),
+  created_at: z.coerce.date().nullable().optional(),
+  updated_at: z.coerce.date().nullable().optional(),
+});
+
+const createEnrollmentSchema = enrollmentSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+export type EnrollmentInput = z.infer<typeof createEnrollmentSchema>;
+
 export const expenseSchema = z.object({
-  branch_id: z.string().uuid().optional().nullable(),
-  academic_year_id: z.string().uuid().optional().nullable(),
-  description: z.string().optional().nullable(),
+  id: z.string().uuid(),
+  academic_year_id: z.string().uuid(),
   title: z.string(),
+  description: z.string().nullable().optional(),
+  type: z.nativeEnum(ExpenseType),
   amount: z.number(),
-  type: z.string(),
-  date: z.string().optional().nullable(),
+  date: z.coerce.date(),
+  receipt: z.string().max(255).nullable().optional(),
+  branchId: z.string().uuid().nullable().optional(),
 });
-export type ExpenseInput = z.infer<typeof expenseSchema>;
 
-// Fee
+const createExpenseSchema = expenseSchema.omit({
+  id: true,
+});
+
+export type ExpenseInput = z.infer<typeof createExpenseSchema>;
+
 export const feeSchema = z.object({
-  student_id: z.string().uuid().optional().nullable(),
+  id: z.string().uuid(),
+  academic_year_id: z.string().uuid(),
+  student_id: z.string().uuid(),
   amount: z.number(),
-  due_date: z.string().optional().nullable(),
-  status: z.enum(["Paid", "Unpaid"]),
-  type: z.enum(["Tuition", "Exam", "Other"]),
-  attachment: z.string().optional().nullable(),
-  note: z.string().optional().nullable(),
+  due_date: z.coerce.date().nullable().optional(),
+  status: z.nativeEnum(FeeStatus),
+  type: z.nativeEnum(FeeType),
+  receipt: z.string().max(255).nullable().optional(),
+  note: z.string().nullable().optional(),
+  created_at: z.coerce.date().nullable().optional(),
+  updated_at: z.coerce.date().nullable().optional(),
 });
-export type FeeInput = z.infer<typeof feeSchema>;
 
-// LeaveRequest
+const createFeeSchema = feeSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+export type FeeInput = z.infer<typeof createFeeSchema>;
+
+export const financeSummarySchema = z.object({
+  id: z.string().uuid(),
+  full_name: z.string().max(200).nullable().optional(),
+  full_name_local: z.string().max(200).nullable().optional(),
+  sex: z.nativeEnum(Sex).nullable().optional(),
+  ay_name: z.string().max(100).nullable().optional(),
+  ay_name_local: z.string().max(100).nullable().optional(),
+  total_fee: z.number().nullable().optional(),
+  total_expense: z.number().nullable().optional(),
+  net_balance: z.number().nullable().optional(),
+  created_at: z.coerce.date().nullable().optional(),
+  updated_at: z.coerce.date().nullable().optional(),
+});
+
+const createFinanceSummarySchema = financeSummarySchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+export type FinanceSummaryInput = z.infer<typeof createFinanceSummarySchema>;
+
 export const leaveRequestSchema = z.object({
-  staff_id: z.string().uuid().optional().nullable(),
-  start_date: z.string().optional().nullable(),
-  end_date: z.string().optional().nullable(),
-  reason: z.string().optional().nullable(),
-  status: z.enum(["Pending", "Approved", "Rejected"]),
+  id: z.string().uuid(),
+  academic_year_id: z.string().uuid(),
+  student_id: z.string().uuid().nullable().optional(),
+  teacher_id: z.string().uuid().nullable().optional(),
+  staff_id: z.string().uuid().nullable().optional(),
+  start_date: z.coerce.date().nullable().optional(),
+  end_date: z.coerce.date().nullable().optional(),
+  note: z.string().nullable().optional(),
+  status: z.nativeEnum(LeaveStatus),
 });
-export type LeaveRequestInput = z.infer<typeof leaveRequestSchema>;
 
-// LibraryBook
-export const libraryBookSchema = z.object({
-  branch_id: z.string().uuid().optional().nullable(),
+const createLeaveRequestSchema = leaveRequestSchema.omit({
+  id: true,
+});
+
+export type LeaveRequestInput = z.infer<typeof createLeaveRequestSchema>;
+
+export const libraryItemSchema = z.object({
+  id: z.string().uuid(),
+  branch_id: z.string().uuid(),
+  registration_number: z.string().max(255),
   title: z.string().max(255),
-  author: z.string().max(255).optional().nullable(),
-  isbn: z.string().max(50).optional().nullable(),
-  copies_available: z.number().optional().nullable().default(0),
+  author: z.string().max(255),
+  item_type: z.nativeEnum(LibraryItemType),
+  subject: z.string().max(50),
+  isbn: z.string().max(50).nullable().optional(),
+  copies_available: z.number().int().nullable().optional(),
+  publication_date: z.coerce.date(),
+  note: z.string().nullable().optional(),
 });
-export type LibraryBookInput = z.infer<typeof libraryBookSchema>;
 
-// LibraryTransaction
-export const libraryTransactionSchema = z.object({
-  book_id: z.string().uuid().optional().nullable(),
-  student_id: z.string().uuid().optional().nullable(),
-  teacher_id: z.string().uuid().optional().nullable(),
-  issue_date: z.string().optional().nullable(),
-  return_date: z.string().optional().nullable(),
-  status: z.string().optional().nullable(),
-  note: z.string().optional().nullable(),
+const createLibraryItemSchema = libraryItemSchema.omit({
+  id: true,
 });
-export type LibraryTransactionInput = z.infer<typeof libraryTransactionSchema>;
 
-// Mark
+export type LibraryItemInput = z.infer<typeof createLibraryItemSchema>;
+
+export const libraryItemLoanSchema = z.object({
+  id: z.string().uuid(),
+  item_id: z.string().uuid(),
+  student_id: z.string().uuid().nullable().optional(),
+  teacher_id: z.string().uuid().nullable().optional(),
+  issue_date: z.coerce.date(),
+  return_date: z.coerce.date(),
+  status: z.nativeEnum(BorrowStatus),
+  note: z.string().nullable().optional(),
+  branchId: z.string().uuid().nullable().optional(),
+});
+
+const createLibraryItemLoanSchema = libraryItemLoanSchema.omit({
+  id: true,
+});
+
+export type LibraryItemLoanInput = z.infer<typeof createLibraryItemLoanSchema>;
+
 export const markSchema = z.object({
-  student_id: z.string().uuid().optional().nullable(),
-  assessment_id: z.string().uuid().optional().nullable(),
-  score: z.number().optional().nullable(),
+  id: z.string().uuid(),
+  student_id: z.string().uuid(),
+  assessment_id: z.string().uuid(),
+  score: z.number(),
+  created_at: z.coerce.date().nullable().optional(),
+  updated_at: z.coerce.date().nullable().optional(),
 });
-export type MarkInput = z.infer<typeof markSchema>;
 
-// ParentStudent
+const createMarkSchema = markSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+export type MarkInput = z.infer<typeof createMarkSchema>;
+
+export const schoolSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().max(255),
+  address: z.string().nullable().optional(),
+  contact: z.string().max(100).nullable().optional(),
+  note: z.string().nullable().optional(),
+  better_auth_id: z.string().max(255),
+});
+
+const createSchoolSchema = schoolSchema.omit({
+  id: true,
+});
+
+export type SchoolInput = z.infer<typeof createSchoolSchema>;
+
+export const parentSchema = z.object({
+  id: z.string().uuid(),
+  branch_id: z.string().uuid(),
+  better_auth_id: z.string().uuid(),
+  first_name: z.string().max(100),
+  middle_name: z.string().max(100),
+  phone: z.string().max(50),
+  email: z.string().max(100),
+  sex: z.nativeEnum(Sex),
+  address: z.string(),
+  note: z.string().nullable().optional(),
+  studentRelationsId: z.string().uuid().nullable().optional(),
+});
+
+const createParentSchema = parentSchema.omit({
+  id: true,
+});
+
+export type ParentInput = z.infer<typeof createParentSchema>;
+
+export const staffSchema = z.object({
+  id: z.string().uuid(),
+  branch_id: z.string().uuid().nullable().optional(),
+  better_auth_id: z.string(),
+  first_name: z.string().max(100),
+  middle_name: z.string().max(100),
+  phone: z.string().max(50).nullable().optional(),
+  email: z.string().max(100),
+  sex: z.nativeEnum(Sex).nullable().optional(),
+  role: z.nativeEnum(StaffRole),
+});
+
+const createStaffSchema = staffSchema.omit({
+  id: true,
+});
+
+export type StaffInput = z.infer<typeof createStaffSchema>;
+
+export const studentSchema = z.object({
+  id: z.string().uuid(),
+  branch_id: z.string().uuid(),
+  better_auth_id: z.string().uuid(),
+  first_name: z.string().max(100),
+  middle_name: z.string().max(100),
+  last_name: z.string().max(100),
+  full_name_local: z.string().max(200),
+  sex: z.nativeEnum(Sex),
+  dob: z.coerce.date(),
+  address: z.string(),
+  email: z.string().max(100),
+  phone: z.string().max(50),
+  note: z.string().nullable().optional(),
+  image: z.string().max(255),
+});
+
+const createStudentSchema = studentSchema.omit({
+  id: true,
+});
+
+export type StudentInput = z.infer<typeof createStudentSchema>;
+
+export const teacherSchema = z.object({
+  id: z.string().uuid(),
+  better_auth_id: z.string().uuid(),
+  first_name: z.string().max(100),
+  middle_name: z.string().max(100),
+  phone: z.string().max(50),
+  email: z.string().max(100),
+  sex: z.nativeEnum(Sex),
+  subject_specialization: z.string().max(100),
+  note: z.string().nullable().optional(),
+  image: z.string().max(255),
+  branch_id: z.string().uuid(),
+});
+
+const createTeacherSchema = teacherSchema.omit({
+  id: true,
+});
+
+export type TeacherInput = z.infer<typeof createTeacherSchema>;
+
+export const studentMarkSummarySchema = z.object({
+  id: z.string().uuid(),
+  full_name: z.string().max(200).nullable().optional(),
+  full_name_local: z.string().max(200).nullable().optional(),
+  sex: z.nativeEnum(Sex).nullable().optional(),
+  ay_name: z.string().max(100).nullable().optional(),
+  ay_name_local: z.string().max(100).nullable().optional(),
+  subject: z.string().max(100).nullable().optional(),
+  total_score: z.number().nullable().optional(),
+  average_score: z.number().nullable().optional(),
+  created_at: z.coerce.date().nullable().optional(),
+  updated_at: z.coerce.date().nullable().optional(),
+});
+
+const createStudentMarkSummarySchema = studentMarkSummarySchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+export type StudentMarkSummaryInput = z.infer<
+  typeof createStudentMarkSummarySchema
+>;
+
+export const timetableSchema = z.object({
+  id: z.string().uuid(),
+  academic_year_id: z.string().uuid(),
+  term: z.string().max(100),
+  class: z.string().max(100),
+  section: z.string().max(100),
+  teacher_id: z.string().uuid(),
+  day: z.nativeEnum(Day),
+  period: z.number().int(),
+  note: z.string().nullable().optional(),
+});
+
+const createTimetableSchema = timetableSchema.omit({
+  id: true,
+});
+
+export type TimetableInput = z.infer<typeof createTimetableSchema>;
+
 export const parentStudentSchema = z.object({
+  id: z.string().uuid(),
   student_id: z.string().uuid(),
   parent_id: z.string().uuid(),
-  type: z.enum(["Mother", "Father", "Guardian"]),
+  type: z.nativeEnum(ParentType),
 });
-export type ParentStudentInput = z.infer<typeof parentStudentSchema>;
 
-// Parent
-export const parentSchema = z.object({
-  better_auth_id: z.string().uuid().optional().nullable(),
-  first_name: z.string().max(100),
-  last_name: z.string().max(100),
-  phone: z.string().max(50),
-  email: z.string().max(100).optional().nullable(),
-  gender: z.enum(["Male", "Female"]),
-  address: z.string().optional().nullable(),
-  note: z.string().optional().nullable(),
-  branch_id: z.string().uuid().optional().nullable(),
+const createParentStudentSchema = parentStudentSchema.omit({
+  id: true,
 });
-export type ParentInput = z.infer<typeof parentSchema>;
 
-// School
-export const schoolSchema = z.object({
-  name: z.string().max(255),
-  address: z.string().optional().nullable(),
-  contact: z.string().max(100).optional().nullable(),
-  note: z.string().optional().nullable(),
-});
-export type SchoolInput = z.infer<typeof schoolSchema>;
-
-// Staff
-export const staffSchema = z.object({
-  better_auth_id: z.string().uuid().optional().nullable(),
-  first_name: z.string().max(100),
-  last_name: z.string().max(100),
-  phone: z.string().max(50).optional().nullable(),
-  email: z.string().max(100).optional().nullable(),
-  gender: z.enum(["Male", "Female"]),
-  role: z.enum(["Librarian", "Accountant", "Admin"]),
-  branch_id: z.string().uuid().optional().nullable(),
-});
-export type StaffInput = z.infer<typeof staffSchema>;
-
-// Student
-export const studentSchema = z.object({
-  better_auth_id: z.string().uuid().optional().nullable(),
-  first_name: z.string().max(100),
-  last_name: z.string().max(100),
-  full_name_local: z.string().max(200).optional().nullable(),
-  gender: z.enum(["Male", "Female"]),
-  dob: z.string(),
-  address: z.string().optional().nullable(),
-  email: z.string().max(100).optional().nullable(),
-  phone: z.string().max(50).optional().nullable(),
-  note: z.string().optional().nullable(),
-  branch_id: z.string().uuid(),
-});
-export type StudentInput = z.infer<typeof studentSchema>;
-
-// Teacher
-export const teacherSchema = z.object({
-  better_auth_id: z.string().uuid().optional().nullable(),
-  first_name: z.string().max(100),
-  last_name: z.string().max(100),
-  subject_specialization: z.string().max(100).optional().nullable(),
-  phone: z.string().max(50).optional().nullable(),
-  email: z.string().max(100).optional().nullable(),
-  gender: z.enum(["Male", "Female"]),
-  note: z.string().optional().nullable(),
-  branch_id: z.string().uuid(),
-});
-export type TeacherInput = z.infer<typeof teacherSchema>;
-
-// Term
-export const termSchema = z.object({
-  branch_id: z.string().uuid().optional().nullable(),
-  name: z.string().max(100),
-  start_month: z.number().int().optional().nullable(),
-  end_month: z.number().int().optional().nullable(),
-});
-export type TermInput = z.infer<typeof termSchema>;
+export type ParentStudentInput = z.infer<typeof createParentStudentSchema>;
 
 export const settingSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().uuid(),
+  school_id: z.string().uuid().nullable().optional(),
   number_of_terms: z.number().int(),
   sections_per_class: z.number().int(),
   levels_of_education: z.array(z.string()),
-  school_id: z.string().uuid(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z.coerce.date().nullable().optional(),
+  updated_at: z.coerce.date().nullable().optional(),
 });
-export type SettingInput = z.infer<typeof settingSchema>;
+
+const createSettingSchema = settingSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+export type SettingInput = z.infer<typeof createSettingSchema>;

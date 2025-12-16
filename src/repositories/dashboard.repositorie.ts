@@ -30,30 +30,40 @@ export class DashboardRepository extends BaseRepository<"dashboard"> {
         fees,
       ] = await Promise.all([
         prisma.student.count({
-          where: { branch: { school_id: schoolId }, gender: "Male" },
+          where: { branch: { school_id: schoolId }, sex: "Male" },
         }),
         prisma.student.count({
-          where: { branch: { school_id: schoolId }, gender: "Female" },
+          where: { branch: { school_id: schoolId }, sex: "Female" },
         }),
         prisma.teacher.count({ where: { branch: { school_id: schoolId } } }),
         prisma.attendance.count({
           where: {
-            classsection: { branch: { school_id: schoolId } },
             date: { gte: today.toDate(), lt: tomorrow.toDate() },
+            academicyear: {
+              branch: {
+                school_id: schoolId,
+              },
+            },
           },
         }),
         prisma.expense.findMany({
           where: {
-            branch_id: { in: branchIds },
+            branchId: { in: branchIds },
             date: { gte: startOfYear.toDate(), lte: endOfYear.toDate() },
           },
           select: { amount: true, date: true },
         }),
         prisma.fee.findMany({
           where: {
-            enrollment: { classsection: { branch: { school_id: schoolId } } },
             status: "Paid",
             created_at: { gte: startOfYear.toDate(), lte: endOfYear.toDate() },
+            enrollment: {
+              student: {
+                branch: {
+                  school_id: schoolId,
+                },
+              },
+            },
           },
           select: { amount: true, created_at: true },
         }),

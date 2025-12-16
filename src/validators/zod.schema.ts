@@ -68,13 +68,13 @@ export enum StaffRole {
 }
 
 export enum LibraryItemType {
-  BOOK = "BOOK",
-  MAGAZINE = "MAGAZINE",
-  JOURNAL = "JOURNAL",
-  E_BOOK = "E_BOOK",
-  AUDIO_BOOK = "AUDIO_BOOK",
-  REFERENCE_BOOK = "REFERENCE_BOOK",
-  OTHER = "OTHER",
+  BOOK = "book",
+  MAGAZINE = "magazine",
+  JOURNAL = "journal",
+  E_BOOK = "e_book",
+  AUDIO_BOOK = "audio_book",
+  REFERENCE_BOOK = "reference_book",
+  OTHER = "other",
 }
 
 export enum BorrowStatus {
@@ -292,15 +292,15 @@ const createLeaveRequestSchema = leaveRequestSchema.omit({
 export type LeaveRequestInput = z.infer<typeof createLeaveRequestSchema>;
 
 export const libraryItemSchema = z.object({
-  id: z.string().uuid(),
-  branch_id: z.string().uuid(),
-  registration_number: z.string().max(255),
+  id: z.string().uuid().nullable().optional(),
+  branch_id: z.string().uuid().optional(),
+  registration_number: z.string().nullable().optional(),
   title: z.string().max(255),
   author: z.string().max(255),
   item_type: z.nativeEnum(LibraryItemType),
   subject: z.string().max(50),
   isbn: z.string().max(50).nullable().optional(),
-  copies_available: z.number().int().nullable().optional(),
+  copies_available: z.number().int().min(1),
   publication_date: z.coerce.date(),
   note: z.string().nullable().optional(),
 });

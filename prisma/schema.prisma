@@ -82,13 +82,13 @@ model branch {
   academicyear    academicyear[]
   school          school            @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   expense         expense[]
-  libraryItem     libraryItem[]
+  libraryitem     libraryitem[]
   parent          parent[]
   staff           staff[]
   student         student[]
   teacher         teacher[]
   behavior        behavior[]
-  libraryItemLoan LibraryItemLoan[]
+  libraryItemLoan libraryitemloan[]
 }
 
 model enrollment {
@@ -107,7 +107,7 @@ model enrollment {
   academicyear     academicyear      @relation(fields: [academic_year_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   student          student           @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   fee              fee[]
-  LibraryItemLoan  LibraryItemLoan[]
+  libraryitemloan  libraryitemloan[]
   mark             mark[]
 }
 
@@ -170,23 +170,27 @@ model leaverequest {
   teacher          teacher?          @relation(fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
-model libraryItem {
+model libraryitem {
   id                  String            @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
   branch_id           String            @db.Uuid
-  registration_number String            @db.VarChar(255)
+  registration_number String            @unique @db.VarChar(255)
   title               String            @db.VarChar(255)
   author              String            @db.VarChar(255)
   item_type           LibraryItemType
   subject             String            @db.VarChar(50)
   isbn                String?           @db.VarChar(50)
-  copies_available    Int?              @default(0)
+  copies_available    Int               @default(1) @db.Integer
   publication_date    DateTime          @db.Date
+  parent_id           String?           @db.Uuid
   note                String?
   branch              branch            @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  libraryItemLoan     LibraryItemLoan[]
+  //self relation
+  parent              libraryitem?      @relation("LibraryItemHierarchy", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  children            libraryitem[]     @relation("LibraryItemHierarchy")
+  libraryItemLoan     libraryitemloan[]
 }
 
-model LibraryItemLoan {
+model libraryitemloan {
   id          String       @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
   item_id     String       @db.Uuid
   student_id  String?      @db.Uuid
@@ -195,7 +199,7 @@ model LibraryItemLoan {
   return_date DateTime     @db.Date
   status      BorrowStatus @default(BORROWED)
   note        String?
-  libraryItem libraryItem  @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  libraryitem libraryitem  @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   enrollment  enrollment?  @relation(fields: [student_id], references: [id], onUpdate: NoAction, onDelete: SetNull)
   teacher     teacher?     @relation(fields: [teacher_id], references: [id], onUpdate: NoAction, onDelete: SetNull)
   branch      branch?      @relation(fields: [branchId], references: [id])
@@ -285,7 +289,7 @@ model teacher {
   note                   String?
   image                  String            @db.VarChar(255)
   branch_id              String            @db.Uuid
-  LibraryItemLoan        LibraryItemLoan[]
+  libraryItemLoan        libraryitemloan[]
   branch                 branch            @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   timetable              timetable[]
   assessment             assessment[]
@@ -412,13 +416,13 @@ enum staff_role_enum {
 }
 
 enum LibraryItemType {
-  BOOK
-  MAGAZINE
-  JOURNAL
-  E_BOOK
-  AUDIO_BOOK
-  REFERENCE_BOOK
-  OTHER
+  book
+  magazine
+  journal
+  e_book
+  audio_book
+  reference_book
+  other
 }
 
 enum BorrowStatus {

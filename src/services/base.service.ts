@@ -1,6 +1,20 @@
 import { Request } from "express";
 
-export class BaseService<TRepository> {
+export interface BaseRepository {
+  create(data: any): Promise<any>;
+  findAll(opts: {
+    where?: any;
+    orderBy?: any;
+    take?: number;
+    signal?: any;
+  }): Promise<any>;
+  findById(id: string): Promise<any>;
+  update(id: string, data: any): Promise<any>;
+  delete(id: string): Promise<any>;
+  search(req: Request): Promise<any>;
+}
+
+export class BaseService<TRepository extends BaseRepository> {
   protected repository: TRepository;
 
   constructor(repository: TRepository) {
@@ -8,32 +22,54 @@ export class BaseService<TRepository> {
   }
 
   async create(data: any) {
-    // @ts-ignore
     return this.repository.create(data);
   }
 
   async findAll(req: Request) {
-    // @ts-ignore
-    return this.repository.findAll(req);
+    const {
+      sort_by,
+      sort_dir,
+      limit,
+      branch_id: bi,
+      academic_year_id: ay,
+      school_id: si,
+    } = req.query;
+
+    const orderBy = sort_by
+      ? { [sort_by as string]: sort_dir === "desc" ? "desc" : "asc" }
+      : undefined;
+
+    const take = limit ? parseInt(limit as string, 10) : 10;
+
+    const where: any = {
+      ...(ay && { academic_year_id: ay }),
+      ...(bi && { branch_id: bi }),
+      ...(si && { school_id: si }),
+    };
+
+    const signal = (req as any).prismaSignal;
+
+    return this.repository.findAll({
+      where,
+      orderBy,
+      take,
+      signal,
+    });
   }
 
   async findById(id: string) {
-    // @ts-ignore
     return this.repository.findById(id);
   }
 
   async update(id: string, data: any) {
-    // @ts-ignore
     return this.repository.update(id, data);
   }
 
   async delete(id: string) {
-    // @ts-ignore
     return this.repository.delete(id);
   }
 
-   async search(req: Request) {
-    // @ts-ignore
+  async search(req: Request) {
     return this.repository.search(req);
   }
 }

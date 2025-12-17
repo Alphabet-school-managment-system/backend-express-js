@@ -212,15 +212,15 @@ const createEnrollmentSchema = enrollmentSchema.omit({
 export type EnrollmentInput = z.infer<typeof createEnrollmentSchema>;
 
 export const expenseSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   academic_year_id: z.string().uuid(),
   title: z.string(),
   description: z.string().nullable().optional(),
   type: z.nativeEnum(ExpenseType),
+  other_type: z.string().max(255).nullable().optional(),
   amount: z.number(),
   date: z.coerce.date(),
   receipt: z.string().max(255).nullable().optional(),
-  branchId: z.string().uuid().nullable().optional(),
 });
 
 const createExpenseSchema = expenseSchema.omit({

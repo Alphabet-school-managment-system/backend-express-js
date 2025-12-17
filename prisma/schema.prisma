@@ -81,7 +81,6 @@ model branch {
   isDefault       Boolean           @default(false) @db.Boolean
   academicyear    academicyear[]
   school          school            @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  expense         expense[]
   libraryitem     libraryitem[]
   parent          parent[]
   staff           staff[]
@@ -117,12 +116,13 @@ model expense {
   title            String
   description      String?
   type             expense_type_enum
+  other_type       String?           @db.VarChar(255)
   amount           Decimal           @db.Decimal(10, 2)
   date             DateTime          @db.Date
   receipt          String?           @db.VarChar(255)
-  academicyear     academicyear      @relation(fields: [academic_year_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  branch           branch?           @relation(fields: [branchId], references: [id])
-  branchId         String?           @db.Uuid
+  created_at       DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?         @default(now()) @db.Timestamp(6)
+  academicyear academicyear @relation(fields: [academic_year_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
 }
 
 model fee {

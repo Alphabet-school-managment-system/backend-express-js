@@ -48,7 +48,9 @@ export class DashboardRepository extends BaseRepository<"dashboard"> {
         }),
         prisma.expense.findMany({
           where: {
-            branchId: { in: branchIds },
+            academicyear: {
+              branch_id: { in: branchIds },
+            },
             date: { gte: startOfYear.toDate(), lte: endOfYear.toDate() },
           },
           select: { amount: true, date: true },

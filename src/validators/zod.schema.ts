@@ -237,6 +237,7 @@ export const feeSchema = z.object({
   due_date: z.coerce.date().nullable().optional(),
   status: z.nativeEnum(FeeStatus),
   type: z.nativeEnum(FeeType),
+  other_type: z.string().max(255).nullable().optional(),
   receipt: z.string().max(255).nullable().optional(),
   note: z.string().nullable().optional(),
   created_at: z.coerce.date().nullable().optional(),

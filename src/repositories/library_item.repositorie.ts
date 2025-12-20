@@ -1,3 +1,4 @@
+import { Response } from "express";
 import { BaseRepository } from "./base.repositorie.ts";
 
 export class libraryItemRepo extends BaseRepository<"libraryitem"> {
@@ -7,7 +8,7 @@ export class libraryItemRepo extends BaseRepository<"libraryitem"> {
 
   private add_prefix_zeros = (value: number) => String(value).padStart(6, "0");
 
-  async create(data: any, signal?: AbortSignal) {
+  async create(data: any, res: Response, signal?: AbortSignal) {
     try {
       const last_record = await this.model.findFirst({
         orderBy: { registration_number: "desc" },

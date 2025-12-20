@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ZodObject } from "zod";
 
 type CRUDService = {
-  create: (data: any) => Promise<any>;
+  create: (data: any, res: Response) => Promise<any>;
   findAll: (req: Request) => Promise<any>;
   findById: (id: string) => Promise<any>;
   update: (id: string, data: any) => Promise<any>;
@@ -22,7 +22,7 @@ export class BaseController<TService extends CRUDService, TInput = any> {
   async create(req: Request, res: Response) {
     try {
       const data: TInput = this.schema ? this.schema.parse(req.body) : req.body;
-      const result = await this.service.create(data);
+      const result = await this.service.create(data, res);
       res.status(201).json(result);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -67,7 +67,7 @@ export class BaseController<TService extends CRUDService, TInput = any> {
     }
   }
 
-   async search(req: Request, res: Response) {
+  async search(req: Request, res: Response) {
     try {
       const result = await this.service.search(req);
       res.json(result);

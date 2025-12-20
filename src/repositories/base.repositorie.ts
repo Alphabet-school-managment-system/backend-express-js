@@ -1,5 +1,5 @@
 import { PrismaClient, Prisma } from "@prisma/client";
-import { Request } from "express";
+import { Request, Response } from "express";
 
 export const prisma = new PrismaClient();
 
@@ -10,13 +10,15 @@ export class BaseRepository<
 > {
   protected model: any;
 
+  protected prisma = new PrismaClient();
+
   constructor(model: TModel) {
     this.model = (prisma as any)[model];
   }
 
-  async create(data: TCreate, signal?: AbortSignal) {
+  async create(data: TCreate, res: Response, signal?: AbortSignal) {
     try {
-      return await this.model.create({ data, signal });
+      return await this.model.create({ data, res, signal });
     } catch (error) {
       this.handleError(error);
     }

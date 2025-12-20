@@ -383,9 +383,8 @@ const createParentSchema = parentSchema.omit({
 export type ParentInput = z.infer<typeof createParentSchema>;
 
 export const staffSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   branch_id: z.string().uuid().nullable().optional(),
-  better_auth_id: z.string(),
   first_name: z.string().max(100),
   middle_name: z.string().max(100),
   phone: z.string().max(50).nullable().optional(),

@@ -1,4 +1,4 @@
-import { Request } from "express";
+import { Request, Response } from "express";
 
 export interface BaseRepository {
   create(data: any, res: Response): Promise<any>;

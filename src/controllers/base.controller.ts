@@ -60,7 +60,7 @@ export class BaseController<TService extends CRUDService, TInput = any> {
 
   async delete(req: Request, res: Response) {
     try {
-      await this.service.delete(req.params.id);
+      const result = await this.service.delete(req.params.id);
       res.status(204).send();
     } catch (error: any) {
       res.status(400).json({ error: error.message });

@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient, User } from "@prisma/client";
 import nodemailer from "nodemailer";
-import { admin } from "better-auth/plugins";
+import { admin, emailOTP } from "better-auth/plugins";
 
 const prisma = new PrismaClient();
 const app: {
@@ -103,9 +103,46 @@ export const auth_client = ({
         });
       },
     },
-    plugins: [admin()],
+    plugins: [
+      admin(),
+      emailOTP({
+        async sendVerificationOTP({ email, otp, type }) {
+          if (type === "sign-in") {
+            // Send the OTP for sign in
+          } else if (type === "email-verification") {
+            // Send the OTP for email verification
+          } else {
+            // Send the OTP for password reset
+            await transporter.sendMail({
+              from: `"${app?.name}" <${app?.fromEmail}>`,
+              to: email,
+              subject: "Password Reset OTP",
+              html: `
+                <p>You requested to reset your password.</p>
+                <p>Your OTP code is:</p>
+                <h3 style="letter-spacing: 2px;">${otp}</h3>
+                 <p>
+                  Click
+                  <a href="${app?.url}/auth/reset-password?email=${email}">
+                    here
+                  </a>
+                  to reset your password.
+                </p>
+                <p>This OTP will expire in 10 minutes and 5 attempts only.</p>
+                <p>If you did not request this, please ignore this email.</p>
+                <br/>
+                <p>— ${app?.name} Team</p>
+              `,
+            });
+          }
+        },
+        otpLength: 6,
+        expiresIn: 600,
+        allowedAttempts: 5,
+      }),
+    ],
     trustedOrigins: [app?.url],
   });
 
-  return {auth};
+  return { auth };
 };

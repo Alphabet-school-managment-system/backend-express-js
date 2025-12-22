@@ -33,9 +33,10 @@ import { auth_client } from "./lib/auth.js";
 
 const app = express();
 
+app.use(cors({ origin: true, credentials: true }));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://alphabet-sms.vercel.app"],
     credentials: true,
   })
 );

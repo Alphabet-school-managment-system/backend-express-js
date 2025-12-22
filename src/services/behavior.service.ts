@@ -1,6 +1,6 @@
-import { BehaviorRepository } from "../repositories/behavior.repositorie.ts";
+import { BehaviorRepository } from "../repositories/behavior.repositorie.js";
 
-import { BaseService } from "./base.service.ts";
+import { BaseService } from "./base.service.js";
 
 export class BehaviorService extends BaseService<BehaviorRepository> {
   constructor() {

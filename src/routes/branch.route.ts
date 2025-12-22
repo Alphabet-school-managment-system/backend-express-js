@@ -1,7 +1,7 @@
-import { BranchController } from "../controllers/branch.controller.ts";
-import { validate } from "../middlewares/validate.middleware.ts";
-import { branchSchema } from "../validators/zod.schema.ts";
-import { BaseRouter, idSchema } from "./base.router.ts";
+import { BranchController } from "../controllers/branch.controller.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { branchSchema } from "../validators/zod.schema.js";
+import { BaseRouter, idSchema } from "./base.router.js";
 
 const branchController = new BranchController();
 

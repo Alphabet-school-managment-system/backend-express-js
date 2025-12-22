@@ -1,7 +1,7 @@
-import { BehaviorService } from "../services/behavior.service.ts";
-import { behaviorSchema } from "../validators/zod.schema.ts";
+import { BehaviorService } from "../services/behavior.service.js";
+import { behaviorSchema } from "../validators/zod.schema.js";
 
-import { BaseController } from "./base.controller.ts";
+import { BaseController } from "./base.controller.js";
 
 export class BehaviorController extends BaseController<BehaviorService> {
   constructor() {

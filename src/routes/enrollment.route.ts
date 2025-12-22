@@ -1,6 +1,6 @@
-import { BaseRouter } from "./base.router.ts";
-import { EnrollmentController } from "../controllers/enrollment.controller.ts";
-import { enrollmentSchema } from "../validators/zod.schema.ts";
+import { BaseRouter } from "./base.router.js";
+import { EnrollmentController } from "../controllers/enrollment.controller.js";
+import { enrollmentSchema } from "../validators/zod.schema.js";
 
 const router = new BaseRouter(new EnrollmentController(), enrollmentSchema)
   .router;

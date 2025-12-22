@@ -1,9 +1,9 @@
-import { ParentService } from "../services/parent.service.ts";
+import { ParentService } from "../services/parent.service.js";
 import {
   parentSchema,
   ParentInput,
-} from "../validators/zod.schema.ts";
-import { BaseController } from "./base.controller.ts";
+} from "../validators/zod.schema.js";
+import { BaseController } from "./base.controller.js";
 
 export class ParentController extends BaseController<
   ParentService,

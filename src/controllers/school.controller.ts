@@ -1,9 +1,9 @@
-import { SchoolService } from "../services/school.service.ts";
+import { SchoolService } from "../services/school.service.js";
 import {
   schoolSchema,
   SchoolInput,
-} from "../validators/zod.schema.ts";
-import { BaseController } from "./base.controller.ts";
+} from "../validators/zod.schema.js";
+import { BaseController } from "./base.controller.js";
 
 export class SchoolController extends BaseController<
   SchoolService,

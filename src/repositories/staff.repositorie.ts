@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { BaseRepository } from "./base.repositorie.ts";
+import { BaseRepository } from "./base.repositorie.js";
 
 export class staffRepo extends BaseRepository<"staff"> {
   constructor() {

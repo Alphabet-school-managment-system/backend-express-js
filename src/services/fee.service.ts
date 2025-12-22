@@ -1,5 +1,5 @@
-import { feeRepo } from "../repositories/fee.repositorie.ts";
-import { BaseService } from "./base.service.ts";
+import { feeRepo } from "../repositories/fee.repositorie.js";
+import { BaseService } from "./base.service.js";
 
 export class FeeService extends BaseService<feeRepo> {
   constructor() {

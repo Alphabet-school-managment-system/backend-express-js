@@ -1,4 +1,4 @@
-import { BaseRepository, prisma } from "./base.repositorie.ts";
+import { BaseRepository, prisma } from "./base.repositorie.js";
 import dayjs from "dayjs";
 
 export class DashboardRepository extends BaseRepository<"dashboard"> {

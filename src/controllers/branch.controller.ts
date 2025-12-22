@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { BranchService } from "../services/branch.service.ts";
-import { branchSchema } from "../validators/zod.schema.ts";
+import { BranchService } from "../services/branch.service.js";
+import { branchSchema } from "../validators/zod.schema.js";
 
-import { BaseController } from "./base.controller.ts";
+import { BaseController } from "./base.controller.js";
 
 export class BranchController extends BaseController<BranchService> {
   constructor() {

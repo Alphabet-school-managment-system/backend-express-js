@@ -1,6 +1,6 @@
-import { DashboardRepository } from "../repositories/dashboard.repositorie.ts";
+import { DashboardRepository } from "../repositories/dashboard.repositorie.js";
 
-import { BaseService } from "./base.service.ts";
+import { BaseService } from "./base.service.js";
 
 export class DashboardService extends BaseService<DashboardRepository> {
   constructor() {

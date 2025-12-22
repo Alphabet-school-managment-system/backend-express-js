@@ -7,7 +7,7 @@ export function validate(schema?: ZodObject<any>) {
     const result: any = schema?.safeParse(data);
     if (!result.success) {
       console.log(
-        "%csrc/middlewares/validate.middleware.ts:9 result.error",
+        "%csrc/middlewares/validate.middleware.js:9 result.error",
         "color: #007acc;",
         result.error
       );

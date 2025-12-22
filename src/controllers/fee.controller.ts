@@ -1,6 +1,6 @@
-import { FeeService } from "../services/fee.service.ts";
-import { feeSchema, FeeInput } from "../validators/zod.schema.ts";
-import { BaseController } from "./base.controller.ts";
+import { FeeService } from "../services/fee.service.js";
+import { feeSchema, FeeInput } from "../validators/zod.schema.js";
+import { BaseController } from "./base.controller.js";
 
 export class FeeController extends BaseController<FeeService, FeeInput> {
   constructor() {

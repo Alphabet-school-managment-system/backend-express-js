@@ -1,4 +1,4 @@
-import { BaseRepository } from "./base.repositorie.ts";
+import { BaseRepository } from "./base.repositorie.js";
 
 export class settingRepo extends BaseRepository<"setting"> {
   constructor() {

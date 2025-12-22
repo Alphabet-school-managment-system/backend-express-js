@@ -2,34 +2,34 @@ import express from "express";
 import cors from "cors";
 
 // Import routes
-import academicYearRoutes from "./routes/academic_year.route.ts";
-import assessmentRoutes from "./routes/assessment.route.ts";
-import attendanceRoutes from "./routes/attendance.route.ts";
-import behaviorRoutes from "./routes/behavior.route.ts";
-import branchRoutes from "./routes/branch.route.ts";
-import enrollmentRoutes from "./routes/enrollment.route.ts";
-import expenseRoutes from "./routes/expense.route.ts";
-import feeRoutes from "./routes/fee.route.ts";
-import financeSummaryRoutes from "./routes/finance_summary.route.ts";
-import leaveRequestRoutes from "./routes/leave_request.route.ts";
-import libraryItemRoutes from "./routes/library_item.route.ts";
-import libraryItemLoanRoutes from "./routes/library_item_loan.route.ts";
-import markRoutes from "./routes/mark.route.ts";
-import parentRoutes from "./routes/parent.route.ts";
-import parentStudentsRoutes from "./routes/parent_student.route.ts";
-import schoolRoutes from "./routes/school.route.ts";
-import staffRoutes from "./routes/staff.route.ts";
-import studentRoutes from "./routes/student.route.ts";
-import studentMarkSummaryRoutes from "./routes/student_mark_summary.route.ts";
-import teacherRoutes from "./routes/teacher.route.ts";
-import settingRoutes from "./routes/setting.route.ts";
-import authRoutes from "./routes/auth.route.ts";
-import dashboardRoutes from "./routes/dashboard.route.ts";
+import academicYearRoutes from "./routes/academic_year.route.js";
+import assessmentRoutes from "./routes/assessment.route.js";
+import attendanceRoutes from "./routes/attendance.route.js";
+import behaviorRoutes from "./routes/behavior.route.js";
+import branchRoutes from "./routes/branch.route.js";
+import enrollmentRoutes from "./routes/enrollment.route.js";
+import expenseRoutes from "./routes/expense.route.js";
+import feeRoutes from "./routes/fee.route.js";
+import financeSummaryRoutes from "./routes/finance_summary.route.js";
+import leaveRequestRoutes from "./routes/leave_request.route.js";
+import libraryItemRoutes from "./routes/library_item.route.js";
+import libraryItemLoanRoutes from "./routes/library_item_loan.route.js";
+import markRoutes from "./routes/mark.route.js";
+import parentRoutes from "./routes/parent.route.js";
+import parentStudentsRoutes from "./routes/parent_student.route.js";
+import schoolRoutes from "./routes/school.route.js";
+import staffRoutes from "./routes/staff.route.js";
+import studentRoutes from "./routes/student.route.js";
+import studentMarkSummaryRoutes from "./routes/student_mark_summary.route.js";
+import teacherRoutes from "./routes/teacher.route.js";
+import settingRoutes from "./routes/setting.route.js";
+import authRoutes from "./routes/auth.route.js";
+import dashboardRoutes from "./routes/dashboard.route.js";
 
 import jwt from "jsonwebtoken";
 
 import { toNodeHandler } from "better-auth/node";
-import { auth_client } from "./lib/auth.ts";
+import { auth_client } from "./lib/auth.js";
 
 const app = express();
 

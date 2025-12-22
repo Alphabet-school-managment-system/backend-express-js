@@ -1,9 +1,9 @@
-import { LibraryItemService } from "../services/library_item.service.ts";
+import { LibraryItemService } from "../services/library_item.service.js";
 import {
   libraryItemSchema,
   LibraryItemInput,
-} from "../validators/zod.schema.ts";
-import { BaseController } from "./base.controller.ts";
+} from "../validators/zod.schema.js";
+import { BaseController } from "./base.controller.js";
 
 export class LibraryItemController extends BaseController<
   LibraryItemService,

@@ -1,6 +1,6 @@
-import { DashboardService } from "../services/dashboard.service.ts";
+import { DashboardService } from "../services/dashboard.service.js";
 
-import { BaseController } from "./base.controller.ts";
+import { BaseController } from "./base.controller.js";
 
 export class DashboardController extends BaseController<DashboardService> {
   constructor() {

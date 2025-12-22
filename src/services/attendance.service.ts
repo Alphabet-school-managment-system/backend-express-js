@@ -1,5 +1,5 @@
-import { AttendanceRepository } from "../repositories/attendance.repositorie.ts";
-import { BaseService } from "./base.service.ts";
+import { AttendanceRepository } from "../repositories/attendance.repositorie.js";
+import { BaseService } from "./base.service.js";
 
 export class AttendanceService extends BaseService<AttendanceRepository> {
   constructor() {

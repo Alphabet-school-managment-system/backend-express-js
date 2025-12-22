@@ -1,9 +1,9 @@
-import { LeaveRequestService } from "../services/leave_request.service.ts";
+import { LeaveRequestService } from "../services/leave_request.service.js";
 import {
   leaveRequestSchema,
   LeaveRequestInput,
-} from "../validators/zod.schema.ts";
-import { BaseController } from "./base.controller.ts";
+} from "../validators/zod.schema.js";
+import { BaseController } from "./base.controller.js";
 
 export class LeaveRequestController extends BaseController<
   LeaveRequestService,

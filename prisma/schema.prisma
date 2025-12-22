@@ -232,7 +232,7 @@ model school {
 model parent {
   id               String          @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
   branch_id        String          @db.Uuid
-  better_auth_id   String          @db.Uuid
+  better_auth_id   String          @db.VarChar(255)
   first_name       String          @db.VarChar(100)
   middle_name      String          @db.VarChar(100)
   phone            String          @db.VarChar(50)
@@ -241,60 +241,63 @@ model parent {
   address          String
   note             String?
   studentRelations parentstudent[]
-  branch           branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: SetNull)
+  branch           branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model staff {
   id             String          @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
   branch_id      String?         @db.Uuid
-  better_auth_id String
+  better_auth_id String          @db.VarChar(255)
   first_name     String          @db.VarChar(100)
   middle_name    String          @db.VarChar(100)
   phone          String?         @db.VarChar(50)
   email          String          @db.VarChar(100)
   sex            sex_enum?
   role           staff_role_enum
-  branch         branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  branch         branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model student {
-  id              String          @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
-  branch_id       String          @db.Uuid
-  better_auth_id  String          @db.Uuid
-  first_name      String          @db.VarChar(100)
-  middle_name     String          @db.VarChar(100)
-  last_name       String          @db.VarChar(100)
-  full_name_local String          @db.VarChar(200)
-  sex             sex_enum
-  dob             DateTime        @db.Date
-  address         String
-  email           String          @db.VarChar(100)
-  phone           String          @db.VarChar(50)
-  note            String?
-  image           String          @db.VarChar(255)
-  enrollment      enrollment[]
-  parentRelations parentstudent[]
-  branch          branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  leaverequests   leaverequest[]
+  id                          String          @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  branch_id                   String          @db.Uuid
+  better_auth_id              String          @db.VarChar(255)
+  first_name                  String          @db.VarChar(100)
+  middle_name                 String          @db.VarChar(100)
+  last_name                   String          @db.VarChar(100)
+  full_name_local             String          @db.VarChar(200)
+  sex                         sex_enum
+  dob                         DateTime        @db.Date
+  address                     String
+  email                       String          @db.VarChar(100)
+  phone                       String          @db.VarChar(50)
+  note                        String?
+  image                       String?         @db.VarChar(255)
+  student_registration_number Int             @default(autoincrement())
+  enrollment                  enrollment[]
+  parentRelations             parentstudent[]
+  branch                      branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  leaverequests               leaverequest[]
 }
 
 model teacher {
-  id                     String            @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
-  better_auth_id         String            @db.Uuid
-  first_name             String            @db.VarChar(100)
-  middle_name            String            @db.VarChar(100)
-  phone                  String            @db.VarChar(50)
-  email                  String            @db.VarChar(100)
-  sex                    sex_enum
-  subject_specialization String            @db.VarChar(100)
-  note                   String?
-  image                  String            @db.VarChar(255)
-  branch_id              String            @db.Uuid
-  libraryItemLoan        libraryitemloan[]
-  branch                 branch            @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  timetable              timetable[]
-  assessment             assessment[]
-  leaverequests          leaverequest[]
+  id                          String            @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  better_auth_id              String            @db.VarChar(255)
+  first_name                  String            @db.VarChar(100)
+  middle_name                 String            @db.VarChar(100)
+  phone                       String            @db.VarChar(50)
+  email                       String            @db.VarChar(100)
+  sex                         sex_enum
+  subject_specialization      String            @db.VarChar(100)
+  note                        String?
+  image                       String?           @db.VarChar(255)
+  teacher_registration_number Int               @default(autoincrement())
+  branch_id                   String            @db.Uuid
+  libraryItemLoan             libraryitemloan[]
+  branch                      branch?           @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  timetable     timetable[]
+  assessment    assessment[]
+  leaverequests leaverequest[]
 }
 
 model studentmarksummary {

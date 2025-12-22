@@ -29,7 +29,7 @@ import dashboardRoutes from "./routes/dashboard.route.ts";
 import jwt from "jsonwebtoken";
 
 import { toNodeHandler } from "better-auth/node";
-import { auth } from "./lib/auth.ts";
+import { auth_client } from "./lib/auth.ts";
 
 const app = express();
 
@@ -42,7 +42,7 @@ app.use(
 
 app.use(express.json());
 
-app.all("/api/auth/{*any}", toNodeHandler(auth));
+app.all("/api/auth/{*any}", toNodeHandler(auth_client({}).auth));
 
 const JWT_SECRET = process.env.JWT_SECRET;
 

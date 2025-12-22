@@ -1,34 +1,118 @@
-import express from "express";
+import express, { Response } from "express";
 import { signupSchema } from "../validators/zod.schema.ts";
 import { validate } from "../middlewares/validate.middleware.ts";
 import { handleError, prisma } from "../repositories/base.repositorie.ts";
-import { auth } from "../lib/auth.ts";
+import { auth_client } from "../lib/auth.ts";
 import z from "zod";
+import crypto from "crypto";
 
 const router = express.Router();
 
-router.post("/signup", validate(signupSchema), async (req, res) => {
-  const { email, password, first_name, last_name, school_name } = req.body;
+export const get_random_password = () => {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
 
+  let password = "";
+  for (let i = 0; i < 12; i++) {
+    password += chars[crypto.randomInt(0, chars.length)];
+  }
+
+  return password;
+};
+
+export const auth_signup = async ({
+  data,
+  after_func,
+  success_message = "Account created successfully. Please check your email to verify your account.",
+  res,
+  includePasswordInEmailTemplate = false,
+}: {
+  data: {
+    email: string;
+    password: string;
+    name: string;
+  };
+  after_func: ({
+    better_auth_id,
+    tx,
+  }: {
+    better_auth_id: string;
+    tx: any;
+  }) => Promise<void>;
+  success_message?: string;
+  res: Response;
+  includePasswordInEmailTemplate?: boolean;
+}) => {
   let Better_auth_response: any = null;
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
-      const { response } = await auth.api.signUpEmail({
-        returnHeaders: true,
-        body: {
-          email,
-          password,
-          name: `${first_name}`,
-        },
+    const result = await prisma.$transaction(
+      async (tx) => {
+        const { response } = await auth_client({
+          password: includePasswordInEmailTemplate ? data?.password : undefined,
+        }).auth.api.signUpEmail({
+          returnHeaders: true,
+          body: data,
+        });
+
+        Better_auth_response = response;
+
+        await after_func({
+          better_auth_id: response?.user?.id,
+          tx,
+        });
+
+        return response;
+      },
+      { timeout: 15000 }
+    );
+
+    res.status(201).json({
+      message: success_message,
+      data: result,
+    });
+  } catch (err: any) {
+    if (Better_auth_response?.user?.token) {
+      auth_delete_user({
+        token: Better_auth_response?.token,
+        res: res,
       });
 
-      Better_auth_response = response;
+      // for none BA error
+      res.status(400).json({ error: handleError(err) });
+    }
+    res.status(400).json({ error: err.message });
+  }
+};
 
+export const auth_delete_user = async ({
+  token,
+  res,
+}: {
+  token: string;
+  res: Response;
+}) => {
+  try {
+    await auth_client({}).auth.api.deleteUser({
+      body: {
+        token: token,
+      },
+    });
+  } catch (rollbackError: any) {
+    return res.status(400).json({ error: handleError(rollbackError) });
+  }
+};
+
+router.post("/signup", validate(signupSchema), async (req, res) => {
+  const { first_name } = req.body;
+
+  auth_signup({
+    data: { ...req.body, name: `${first_name}` },
+    after_func: async ({ better_auth_id, tx }) => {
       const school = await tx.school.create({
         data: {
-          name: school_name,
-          better_auth_id: response?.user?.id,
+          name: req.body?.school_name,
+          better_auth_id,
         },
       });
 
@@ -40,31 +124,9 @@ router.post("/signup", validate(signupSchema), async (req, res) => {
           isDefault: true,
         },
       });
-
-      return response;
-    });
-
-    res.status(201).json({
-      message:
-        "Account created successfully. Please check your email to verify your account.",
-      data: result,
-    });
-  } catch (err: any) {
-    if (Better_auth_response?.user?.token) {
-      try {
-        await auth.api.deleteUser({
-          body: { token: Better_auth_response?.token },
-        });
-      } catch (rollbackError: any) {
-        res.status(400).json({ error: err.message });
-      }
-
-      // for none BA error
-      res.status(400).json({ error: handleError(err) });
-    }
-
-    res.status(400).json({ error: err.message });
-  }
+    },
+    res: res,
+  });
 });
 
 router.get(

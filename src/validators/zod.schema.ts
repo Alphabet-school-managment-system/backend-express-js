@@ -212,15 +212,15 @@ const createEnrollmentSchema = enrollmentSchema.omit({
 export type EnrollmentInput = z.infer<typeof createEnrollmentSchema>;
 
 export const expenseSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   academic_year_id: z.string().uuid(),
   title: z.string(),
   description: z.string().nullable().optional(),
   type: z.nativeEnum(ExpenseType),
+  other_type: z.string().max(255).nullable().optional(),
   amount: z.number(),
   date: z.coerce.date(),
   receipt: z.string().max(255).nullable().optional(),
-  branchId: z.string().uuid().nullable().optional(),
 });
 
 const createExpenseSchema = expenseSchema.omit({
@@ -237,6 +237,7 @@ export const feeSchema = z.object({
   due_date: z.coerce.date().nullable().optional(),
   status: z.nativeEnum(FeeStatus),
   type: z.nativeEnum(FeeType),
+  other_type: z.string().max(255).nullable().optional(),
   receipt: z.string().max(255).nullable().optional(),
   note: z.string().nullable().optional(),
   created_at: z.coerce.date().nullable().optional(),
@@ -362,9 +363,8 @@ const createSchoolSchema = schoolSchema.omit({
 export type SchoolInput = z.infer<typeof createSchoolSchema>;
 
 export const parentSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   branch_id: z.string().uuid(),
-  better_auth_id: z.string().uuid(),
   first_name: z.string().max(100),
   middle_name: z.string().max(100),
   phone: z.string().max(50),
@@ -382,9 +382,8 @@ const createParentSchema = parentSchema.omit({
 export type ParentInput = z.infer<typeof createParentSchema>;
 
 export const staffSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   branch_id: z.string().uuid().nullable().optional(),
-  better_auth_id: z.string(),
   first_name: z.string().max(100),
   middle_name: z.string().max(100),
   phone: z.string().max(50).nullable().optional(),
@@ -400,9 +399,8 @@ const createStaffSchema = staffSchema.omit({
 export type StaffInput = z.infer<typeof createStaffSchema>;
 
 export const studentSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   branch_id: z.string().uuid(),
-  better_auth_id: z.string().uuid(),
   first_name: z.string().max(100),
   middle_name: z.string().max(100),
   last_name: z.string().max(100),
@@ -413,7 +411,7 @@ export const studentSchema = z.object({
   email: z.string().max(100),
   phone: z.string().max(50),
   note: z.string().nullable().optional(),
-  image: z.string().max(255),
+  image: z.string().max(255).nullable().optional(),
 });
 
 const createStudentSchema = studentSchema.omit({
@@ -423,8 +421,7 @@ const createStudentSchema = studentSchema.omit({
 export type StudentInput = z.infer<typeof createStudentSchema>;
 
 export const teacherSchema = z.object({
-  id: z.string().uuid(),
-  better_auth_id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   first_name: z.string().max(100),
   middle_name: z.string().max(100),
   phone: z.string().max(50),
@@ -432,7 +429,7 @@ export const teacherSchema = z.object({
   sex: z.nativeEnum(Sex),
   subject_specialization: z.string().max(100),
   note: z.string().nullable().optional(),
-  image: z.string().max(255),
+  image: z.string().max(255).nullable().optional(),
   branch_id: z.string().uuid(),
 });
 

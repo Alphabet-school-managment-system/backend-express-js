@@ -1,7 +1,7 @@
-import { Request } from "express";
+import { Request, Response } from "express";
 
 export interface BaseRepository {
-  create(data: any): Promise<any>;
+  create(data: any, res: Response): Promise<any>;
   findAll(opts: {
     where?: any;
     orderBy?: any;
@@ -21,8 +21,8 @@ export class BaseService<TRepository extends BaseRepository> {
     this.repository = repository;
   }
 
-  async create(data: any) {
-    return this.repository.create(data);
+  async create(data: any, res: Response) {
+    return this.repository.create(data, res);
   }
 
   async findAll(req: Request) {

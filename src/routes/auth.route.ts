@@ -46,23 +46,26 @@ export const auth_signup = async ({
   let Better_auth_response: any = null;
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
-      const { response } = await auth_client({
-        password: includePasswordInEmailTemplate ? data?.password : undefined,
-      }).auth.api.signUpEmail({
-        returnHeaders: true,
-        body: data,
-      });
+    const result = await prisma.$transaction(
+      async (tx) => {
+        const { response } = await auth_client({
+          password: includePasswordInEmailTemplate ? data?.password : undefined,
+        }).auth.api.signUpEmail({
+          returnHeaders: true,
+          body: data,
+        });
 
-      Better_auth_response = response;
+        Better_auth_response = response;
 
-      await after_func({
-        better_auth_id: response?.user?.id,
-        tx,
-      });
+        await after_func({
+          better_auth_id: response?.user?.id,
+          tx,
+        });
 
-      return response;
-    });
+        return response;
+      },
+      { timeout: 15000 }
+    );
 
     res.status(201).json({
       message: success_message,
@@ -78,7 +81,6 @@ export const auth_signup = async ({
       // for none BA error
       res.status(400).json({ error: handleError(err) });
     }
-
     res.status(400).json({ error: err.message });
   }
 };

@@ -1,6 +1,6 @@
-import { LibraryItemLoanController } from "../controllers/library_item_loan.controller.ts";
-import { libraryItemLoanSchema } from "../validators/zod.schema.ts";
-import { BaseRouter } from "./base.router.ts";
+import { LibraryItemLoanController } from "../controllers/library_item_loan.controller.js";
+import { libraryItemLoanSchema } from "../validators/zod.schema.js";
+import { BaseRouter } from "./base.router.js";
 
 const router = new BaseRouter(new LibraryItemLoanController(), libraryItemLoanSchema).router;
 

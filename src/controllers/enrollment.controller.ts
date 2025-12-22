@@ -1,7 +1,7 @@
-import { EnrollmentService } from "../services/enrollment.service.ts";
-import { enrollmentSchema } from "../validators/zod.schema.ts";
+import { EnrollmentService } from "../services/enrollment.service.js";
+import { enrollmentSchema } from "../validators/zod.schema.js";
 
-import { BaseController } from "./base.controller.ts";
+import { BaseController } from "./base.controller.js";
 
 export class EnrollmentController extends BaseController<EnrollmentService> {
   constructor() {

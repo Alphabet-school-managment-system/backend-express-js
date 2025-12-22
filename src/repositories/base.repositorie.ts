@@ -1,6 +1,6 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { Request, Response } from "express";
-import { auth_signup, get_random_password } from "../routes/auth.route.ts";
+import { auth_signup, get_random_password } from "../routes/auth.route.js";
 
 export const prisma = new PrismaClient();
 
@@ -142,7 +142,7 @@ export class BaseRepository<
   handleError(error: unknown): never {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       console.log(
-        "%csrc/repositories/base.repositorie.ts:149 error",
+        "%csrc/repositories/base.repositorie.js:149 error",
         "color: #007acc;",
         error
       );
@@ -151,7 +151,7 @@ export class BaseRepository<
       );
     } else {
       console.log(
-        "%csrc/repositories/base.repositorie.ts:154 error",
+        "%csrc/repositories/base.repositorie.js:154 error",
         "color: #007acc;",
         error
       );

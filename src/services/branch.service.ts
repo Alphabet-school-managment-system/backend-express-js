@@ -1,6 +1,6 @@
-import { BranchRepository } from "../repositories/branch.repositorie.ts";
+import { BranchRepository } from "../repositories/branch.repositorie.js";
 
-import { BaseService } from "./base.service.ts";
+import { BaseService } from "./base.service.js";
 
 export class BranchService extends BaseService<BranchRepository> {
   protected repo: BranchRepository;

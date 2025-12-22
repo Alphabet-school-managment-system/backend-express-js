@@ -1,6 +1,6 @@
-import { MarkController } from "../controllers/mark.controller.ts";
-import { markSchema } from "../validators/zod.schema.ts";
-import { BaseRouter } from "./base.router.ts";
+import { MarkController } from "../controllers/mark.controller.js";
+import { markSchema } from "../validators/zod.schema.js";
+import { BaseRouter } from "./base.router.js";
 
 const router = new BaseRouter(new MarkController(), markSchema).router;
 

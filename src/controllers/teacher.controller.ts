@@ -1,6 +1,6 @@
-import { TeacherService } from "../services/teacher.service.ts";
-import { teacherSchema, TeacherInput } from "../validators/zod.schema.ts";
-import { BaseController } from "./base.controller.ts";
+import { TeacherService } from "../services/teacher.service.js";
+import { teacherSchema, TeacherInput } from "../validators/zod.schema.js";
+import { BaseController } from "./base.controller.js";
 
 export class TeacherController extends BaseController<
   TeacherService,

@@ -1,6 +1,6 @@
-import { behaviorSchema } from "../validators/zod.schema.ts";
-import { BehaviorController } from "../controllers/behavior.controller.ts";
-import { BaseRouter } from "./base.router.ts";
+import { behaviorSchema } from "../validators/zod.schema.js";
+import { BehaviorController } from "../controllers/behavior.controller.js";
+import { BaseRouter } from "./base.router.js";
 
 const router = new BaseRouter(new BehaviorController(), behaviorSchema).router;
 

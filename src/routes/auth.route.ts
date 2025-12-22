@@ -1,8 +1,8 @@
 import express, { Response } from "express";
-import { signupSchema } from "../validators/zod.schema.ts";
-import { validate } from "../middlewares/validate.middleware.ts";
-import { handleError, prisma } from "../repositories/base.repositorie.ts";
-import { auth_client } from "../lib/auth.ts";
+import { signupSchema } from "../validators/zod.schema.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { handleError, prisma } from "../repositories/base.repositorie.js";
+import { auth_client } from "../lib/auth.js";
 import z from "zod";
 import crypto from "crypto";
 

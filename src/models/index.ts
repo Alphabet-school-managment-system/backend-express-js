@@ -10,7 +10,7 @@ import {
   LibraryItemType,
   Sex,
   StaffRole,
-} from "./enums.ts";
+} from "./enums.js";
 
 export interface AcademicYear {
   id: string;

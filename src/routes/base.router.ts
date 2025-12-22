@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import z, { ZodObject } from "zod";
-import { validate } from "../middlewares/validate.middleware.ts";
-import { authenticateToken } from "../middlewares/auth.middleware.ts";
+import { validate } from "../middlewares/validate.middleware.js";
+import { authenticateToken } from "../middlewares/auth.middleware.js";
 type CRUDController = {
   create: (req: Request, res: Response) => Promise<any>;
   findAll: (req: Request, res: Response) => Promise<any>;

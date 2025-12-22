@@ -1,6 +1,6 @@
-import { StudentController } from "../controllers/student.controller.ts";
-import { studentSchema } from "../validators/zod.schema.ts";
-import { BaseRouter } from "./base.router.ts";
+import { StudentController } from "../controllers/student.controller.js";
+import { studentSchema } from "../validators/zod.schema.js";
+import { BaseRouter } from "./base.router.js";
 
 const router = new BaseRouter(new StudentController(), studentSchema).router;
 

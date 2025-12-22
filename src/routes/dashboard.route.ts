@@ -1,5 +1,5 @@
-import { DashboardController } from "../controllers/dashboard.controller.ts";
-import { BaseRouter } from "./base.router.ts";
+import { DashboardController } from "../controllers/dashboard.controller.js";
+import { BaseRouter } from "./base.router.js";
 
 const router = new BaseRouter(new DashboardController(), undefined).router;
 

@@ -1,6 +1,6 @@
-import { assessmentSchema } from "../validators/zod.schema.ts";
-import { AssessmentController } from "../controllers/assessment.controller.ts";
-import { BaseRouter } from "./base.router.ts";
+import { assessmentSchema } from "../validators/zod.schema.js";
+import { AssessmentController } from "../controllers/assessment.controller.js";
+import { BaseRouter } from "./base.router.js";
 
 const router = new BaseRouter(new AssessmentController(), assessmentSchema)
   .router;

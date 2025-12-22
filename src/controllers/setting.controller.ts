@@ -1,9 +1,9 @@
-import { SettingService } from "../services/setting.service.ts";
+import { SettingService } from "../services/setting.service.js";
 import {
   settingSchema,
   SettingInput,
-} from "../validators/zod.schema.ts";
-import { BaseController } from "./base.controller.ts";
+} from "../validators/zod.schema.js";
+import { BaseController } from "./base.controller.js";
 
 export class SettingController extends BaseController<
   SettingService,

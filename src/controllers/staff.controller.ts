@@ -1,9 +1,9 @@
-import { StaffService } from "../services/staff.service.ts";
+import { StaffService } from "../services/staff.service.js";
 import {
   staffSchema,
   StaffInput,
-} from "../validators/zod.schema.ts";
-import { BaseController } from "./base.controller.ts";
+} from "../validators/zod.schema.js";
+import { BaseController } from "./base.controller.js";
 
 export class StaffController extends BaseController<
   StaffService,

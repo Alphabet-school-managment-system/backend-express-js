@@ -1,5 +1,5 @@
-import { staffRepo } from "../repositories/staff.repositorie.ts";
-import { BaseService } from "./base.service.ts";
+import { staffRepo } from "../repositories/staff.repositorie.js";
+import { BaseService } from "./base.service.js";
 
 export class StaffService extends BaseService<staffRepo> {
   constructor() {

@@ -1,6 +1,6 @@
-import { MarkService } from "../services/mark.service.ts";
-import { markSchema, MarkInput } from "../validators/zod.schema.ts";
-import { BaseController } from "./base.controller.ts";
+import { MarkService } from "../services/mark.service.js";
+import { markSchema, MarkInput } from "../validators/zod.schema.js";
+import { BaseController } from "./base.controller.js";
 
 export class MarkController extends BaseController<MarkService, MarkInput> {
   constructor() {

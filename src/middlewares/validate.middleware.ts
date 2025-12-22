@@ -6,6 +6,11 @@ export function validate(schema?: ZodObject<any>) {
     const data = { ...req.body, ...req.params, ...req.query };
     const result: any = schema?.safeParse(data);
     if (!result.success) {
+      console.log(
+        "%csrc/middlewares/validate.middleware.ts:9 result.error",
+        "color: #007acc;",
+        result.error
+      );
       return res.status(400).json({
         message: result.error.issues[0]?.message || "Validation error",
       });

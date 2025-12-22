@@ -6,7 +6,7 @@ export class DashboardRepository extends BaseRepository<"dashboard"> {
     super("dashboard");
   }
 
-  async findById(schoolId: string, signal: AbortSignal) {
+  async findById(schoolId: string, signal?: AbortSignal) {
     try {
       const now = dayjs();
       const today = now.startOf("day");

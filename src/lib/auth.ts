@@ -3,7 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient, User } from "@prisma/client";
 import nodemailer from "nodemailer";
 import { admin, emailOTP } from "better-auth/plugins";
-import { TRUSTED_URL } from "../utils/constants.js";
+import { BACKEND_URL } from "../utils/constants.js";
 
 const prisma = new PrismaClient();
 const app: {
@@ -11,7 +11,7 @@ const app: {
   name: string;
   fromEmail: string;
 } = {
-  url: TRUSTED_URL,
+  url: BACKEND_URL.toString(),
   name: "Alphabet",
   fromEmail: "surafelhabte1@gmail.com",
 };

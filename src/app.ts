@@ -30,13 +30,14 @@ import jwt from "jsonwebtoken";
 
 import { toNodeHandler } from "better-auth/node";
 import { auth_client } from "./lib/auth.js";
+import { TRUSTED_ORIGIN } from "./utils/constants.js";
 
 const app = express();
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://alphabet-sms.vercel.app"],
+    origin: TRUSTED_ORIGIN,
     credentials: true,
   })
 );

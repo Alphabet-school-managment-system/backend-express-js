@@ -224,7 +224,7 @@ model school {
   address        String?
   contact        String?   @db.VarChar(100)
   note           String?
-  better_auth_id String    @db.VarChar(255)
+  better_auth_id String?    @db.VarChar(255)
   branch         branch[]
   setting        setting[]
 }

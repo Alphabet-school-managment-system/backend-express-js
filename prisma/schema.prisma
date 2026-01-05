@@ -94,7 +94,7 @@ model enrollment {
   id               String            @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
   academic_year_id String            @db.Uuid
   student_id       String            @db.Uuid
-  class            String            @db.VarChar(100)
+  grade            String            @db.VarChar(100)
   section          String?           @db.VarChar(100)
   isTransferred    Boolean?          @default(false) @db.Boolean
   transferredFrom  String?           @db.VarChar(100)
@@ -224,7 +224,7 @@ model school {
   address        String?
   contact        String?   @db.VarChar(100)
   note           String?
-  better_auth_id String?    @db.VarChar(255)
+  better_auth_id String?   @db.VarChar(255)
   branch         branch[]
   setting        setting[]
 }

@@ -25,6 +25,7 @@ import teacherRoutes from "./routes/teacher.route.js";
 import settingRoutes from "./routes/setting.route.js";
 import authRoutes from "./routes/auth.route.js";
 import dashboardRoutes from "./routes/dashboard.route.js";
+import utilRoutes from "./routes/util.route.js";
 
 import jwt from "jsonwebtoken";
 
@@ -95,5 +96,6 @@ app.use("/api/v1/student", studentRoutes);
 app.use("/api/v1/student-mark-summarie", studentMarkSummaryRoutes);
 app.use("/api/v1/teacher", teacherRoutes);
 app.use("/api/v1/setting", settingRoutes);
+app.use("/api/v1/util", utilRoutes);
 
 export default app;

@@ -25,18 +25,20 @@ import teacherRoutes from "./routes/teacher.route.js";
 import settingRoutes from "./routes/setting.route.js";
 import authRoutes from "./routes/auth.route.js";
 import dashboardRoutes from "./routes/dashboard.route.js";
+import utilRoutes from "./routes/util.route.js";
 
 import jwt from "jsonwebtoken";
 
 import { toNodeHandler } from "better-auth/node";
 import { auth_client } from "./lib/auth.js";
+import { TRUSTED_ORIGIN } from "./utils/constants.js";
 
 const app = express();
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://alphabet-sms.vercel.app"],
+    origin: TRUSTED_ORIGIN,
     credentials: true,
   })
 );
@@ -94,5 +96,6 @@ app.use("/api/v1/student", studentRoutes);
 app.use("/api/v1/student-mark-summarie", studentMarkSummaryRoutes);
 app.use("/api/v1/teacher", teacherRoutes);
 app.use("/api/v1/setting", settingRoutes);
+app.use("/api/v1/util", utilRoutes);
 
 export default app;

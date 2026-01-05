@@ -191,10 +191,10 @@ const createBranchSchema = branchSchema.omit({
 export type BranchInput = z.infer<typeof createBranchSchema>;
 
 export const enrollmentSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   academic_year_id: z.string().uuid(),
   student_id: z.string().uuid(),
-  class: z.string().max(100),
+  grade: z.string().max(100),
   section: z.string().max(100).nullable().optional(),
   isTransferred: z.boolean().nullable().optional(),
   transferredFrom: z.string().max(100).nullable().optional(),
@@ -353,7 +353,7 @@ export const schoolSchema = z.object({
   address: z.string().nullable().optional(),
   contact: z.string().max(100).nullable().optional(),
   note: z.string().nullable().optional(),
-  better_auth_id: z.string().max(255),
+  better_auth_id: z.string().max(255).optional(),
 });
 
 const createSchoolSchema = schoolSchema.omit({
@@ -495,7 +495,7 @@ const createParentStudentSchema = parentStudentSchema.omit({
 export type ParentStudentInput = z.infer<typeof createParentStudentSchema>;
 
 export const settingSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   school_id: z.string().uuid().nullable().optional(),
   number_of_terms: z.number().int(),
   sections_per_class: z.number().int(),

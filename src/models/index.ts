@@ -253,8 +253,8 @@ export interface StudentMarkSummary {
 export interface Timetable {
   id: string;
   academic_year_id: string;
-  term: string;
-  class: string;
+  term?: string;
+  grade: string;
   section: string;
   teacher_id: string;
   day: Day;

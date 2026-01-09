@@ -33,6 +33,8 @@ export class BaseService<TRepository extends BaseRepository> {
       branch_id: bi,
       academic_year_id: ay,
       school_id: si,
+      day,
+      grade,
     } = req.query;
 
     const orderBy = sort_by
@@ -45,6 +47,8 @@ export class BaseService<TRepository extends BaseRepository> {
       ...(ay && { academic_year_id: ay }),
       ...(bi && { branch_id: bi }),
       ...(si && { school_id: si }),
+      ...(day && { day }),
+      ...(grade && { grade: +grade }),
     };
 
     const signal = (req as any).prismaSignal;

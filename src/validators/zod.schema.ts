@@ -97,7 +97,7 @@ export const signupSchema = z.object({
 export type SignupInput = z.infer<typeof signupSchema>;
 
 export const academicYearSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   branch_id: z.string().uuid(),
   name: z.string().max(100),
   name_local: z.string().max(100),
@@ -194,7 +194,7 @@ export const enrollmentSchema = z.object({
   id: z.string().uuid().nullable().optional(),
   academic_year_id: z.string().uuid(),
   student_id: z.string().uuid(),
-  grade: z.string().max(100),
+  grade: z.number().int(),
   section: z.string().max(100).nullable().optional(),
   isTransferred: z.boolean().nullable().optional(),
   transferredFrom: z.string().max(100).nullable().optional(),
@@ -464,14 +464,15 @@ export type StudentMarkSummaryInput = z.infer<
 >;
 
 export const timetableSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   academic_year_id: z.string().uuid(),
-  term: z.string().max(100),
-  class: z.string().max(100),
+  term: z.string().nullable().optional(),
+  grade: z.number().int(),
   section: z.string().max(100),
+  subject: z.string().max(100),
   teacher_id: z.string().uuid(),
   day: z.nativeEnum(Day),
-  period: z.number().int(),
+  period: z.string().max(100),
   note: z.string().nullable().optional(),
 });
 
@@ -498,7 +499,8 @@ export const settingSchema = z.object({
   id: z.string().uuid().nullable().optional(),
   school_id: z.string().uuid().nullable().optional(),
   number_of_terms: z.number().int(),
-  sections_per_class: z.number().int(),
+  sections_per_grade: z.number().int(),
+  periods_per_day: z.number().int(),
   levels_of_education: z.array(z.string()),
   created_at: z.coerce.date().nullable().optional(),
   updated_at: z.coerce.date().nullable().optional(),

@@ -4,6 +4,7 @@ import { PrismaClient, User } from "@prisma/client";
 import nodemailer from "nodemailer";
 import { admin, emailOTP } from "better-auth/plugins";
 import { BACKEND_URL } from "../utils/constants.js";
+import { expo } from "@better-auth/expo";
 
 const prisma = new PrismaClient();
 const app: {
@@ -140,8 +141,9 @@ export const auth_client = ({
         expiresIn: 600,
         allowedAttempts: 5,
       }),
+      expo(),
     ],
-    trustedOrigins: [app?.url],
+    trustedOrigins: [app?.url, "alphabet://", "alphabet://*"],
     cookies: {
       sameSite: "none",
       secure: true,

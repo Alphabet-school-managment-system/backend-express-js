@@ -9,13 +9,13 @@ type CRUDController = {
   update: (req: Request, res: Response) => Promise<any>;
   delete: (req: Request, res: Response) => Promise<any>;
   search: (req: Request, res: Response) => Promise<any>;
+  getIds: (req: Request, res: Response) => Promise<any>;
 };
 
 export const idSchema = z.object({
   id: z
-    .string()
-    .uuid("Invalid UUID format")
-    .min(32, "id must be at least 32 characters."),
+    .uuid({ message: "Invalid UUID format" })
+    .or(z.string().min(32, "id must be at least 32 characters")),
 });
 
 export class BaseRouter<T extends CRUDController> {
@@ -33,35 +33,41 @@ export class BaseRouter<T extends CRUDController> {
       "/",
       validate(schema),
       authenticateToken,
-      this.controller.create.bind(this.controller)
+      this.controller.create.bind(this.controller),
     );
     this.router.put(
       "/:id/update",
       validate(schema),
       authenticateToken,
-      this.controller.update.bind(this.controller)
+      this.controller.update.bind(this.controller),
     );
     this.router.get(
       "/",
       authenticateToken,
-      this.controller.findAll.bind(this.controller)
+      this.controller.findAll.bind(this.controller),
     );
     this.router.get(
       "/search",
       authenticateToken,
-      this.controller.search.bind(this.controller)
+      this.controller.search.bind(this.controller),
     );
     this.router.get(
       "/:id",
       validate(idSchema),
       authenticateToken,
-      this.controller.findOne.bind(this.controller)
+      this.controller.findOne.bind(this.controller),
     );
+    this.router.get(
+      "/getIds/:id",
+      validate(idSchema),
+      this.controller.getIds.bind(this.controller),
+    );
+
     this.router.delete(
       "/:id/delete",
       validate(idSchema),
       authenticateToken,
-      this.controller.delete.bind(this.controller)
+      this.controller.delete.bind(this.controller),
     );
   }
 }

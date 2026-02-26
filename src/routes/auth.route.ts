@@ -64,7 +64,7 @@ export const auth_signup = async ({
 
         return response;
       },
-      { timeout: 15000 }
+      { timeout: 15000 },
     );
 
     res.status(201).json({
@@ -134,7 +134,7 @@ router.get(
   validate(
     z.object({
       id: z.string(),
-    })
+    }),
   ),
   async (req, res) => {
     try {
@@ -185,7 +185,7 @@ router.get(
     } catch (err: any) {
       res.status(400).json({ error: handleError(err) || err.message });
     }
-  }
+  },
 );
 
 export default router;

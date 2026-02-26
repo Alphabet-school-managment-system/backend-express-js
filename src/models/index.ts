@@ -33,6 +33,7 @@ export interface Assessment {
   max_score: number;
   note?: string | null;
   teacher_id?: string | null;
+  academic_year_id?: string | null;
   created_at?: Date | null;
   updated_at?: Date | null;
 }
@@ -133,6 +134,8 @@ export interface LeaveRequest {
   end_date?: Date | null;
   note?: string | null;
   status: LeaveStatus;
+  created_at?: Date | null;
+  updated_at?: Date | null;
 }
 
 export interface LibraryItem {

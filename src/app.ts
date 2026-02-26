@@ -41,7 +41,7 @@ app.use(
   cors({
     origin: TRUSTED_ORIGIN,
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
@@ -52,14 +52,23 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 app.get("/", (req, res) => res.send("API running..."));
 
-app.get("/get-token", (req, res) => {
+export const get_token = () => {
   if (!JWT_SECRET) {
-    return res.status(500).json({ message: "JWT secret is not configured" });
+    return undefined;
   }
   const token: string = jwt.sign({ user: "test" }, JWT_SECRET, {
     algorithm: "HS256",
   });
-  return res.json({ token });
+  return token;
+};
+
+app.get("/get-token", (req, res) => {
+  const token: any = get_token();
+  if (token) {
+    return res.json({ token });
+  } else {
+    return res.status(500).json("Error getting token");
+  }
 });
 
 // Middleware to attach AbortController signal to request

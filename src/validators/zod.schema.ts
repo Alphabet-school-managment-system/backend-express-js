@@ -275,7 +275,7 @@ const createFinanceSummarySchema = financeSummarySchema.omit({
 export type FinanceSummaryInput = z.infer<typeof createFinanceSummarySchema>;
 
 export const leaveRequestSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().optional(),
   academic_year_id: z.string().uuid(),
   student_id: z.string().uuid().nullable().optional(),
   teacher_id: z.string().uuid().nullable().optional(),
@@ -283,7 +283,7 @@ export const leaveRequestSchema = z.object({
   start_date: z.coerce.date().nullable().optional(),
   end_date: z.coerce.date().nullable().optional(),
   note: z.string().nullable().optional(),
-  status: z.nativeEnum(LeaveStatus),
+  status: z.nativeEnum(LeaveStatus).optional().default(LeaveStatus.Pending),
 });
 
 const createLeaveRequestSchema = leaveRequestSchema.omit({

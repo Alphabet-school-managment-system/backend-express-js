@@ -12,6 +12,7 @@ export interface BaseRepository {
   update(id: string, data: any): Promise<any>;
   delete(id: string): Promise<any>;
   search(req: Request): Promise<any>;
+  getIds(id: string): Promise<any>;
 }
 
 export class BaseService<TRepository extends BaseRepository> {
@@ -75,5 +76,9 @@ export class BaseService<TRepository extends BaseRepository> {
 
   async search(req: Request) {
     return this.repository.search(req);
+  }
+
+  async getIds(id: string) {
+    return this.repository.getIds(id);
   }
 }

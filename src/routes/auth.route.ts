@@ -139,6 +139,7 @@ router.get(
   async (req, res) => {
     try {
       const { id } = req.params;
+
       const school = await prisma.school.findFirst({
         where: {
           better_auth_id: id,

@@ -1,22 +1,31 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 import { auth_signup, get_random_password } from "../routes/auth.route.js";
+import { get_token } from "../app.js";
 
 export const prisma = new PrismaClient();
 
 export class BaseRepository<
   TModel extends keyof PrismaClient,
   TCreate = any,
-  TUpdate = any
+  TUpdate = any,
 > {
   protected model: any;
   protected modelName: any;
+  private modelFieldMap = new Map<string, any>();
 
   protected prisma = new PrismaClient();
 
   constructor(model: TModel) {
     this.model = (prisma as any)[model];
     this.modelName = model.toString();
+
+    const modelMeta = Prisma.dmmf.datamodel.models.find(
+      ({ name }) => name === this.modelName,
+    );
+    for (const field of modelMeta?.fields ?? []) {
+      this.modelFieldMap.set(field.name, field);
+    }
   }
 
   async create(data: TCreate, res: Response, signal?: AbortSignal) {
@@ -41,7 +50,7 @@ export class BaseRepository<
           orderBy,
           take,
         },
-        { signal }
+        { signal },
       );
     } catch (error) {
       this.handleError(error);
@@ -72,28 +81,91 @@ export class BaseRepository<
     }
   }
 
+  private normalizeSearchValue(rawValue: string, field: any) {
+    if (field?.kind !== "scalar" && field?.kind !== "enum") return rawValue;
+
+    if (field.kind === "enum") return rawValue;
+
+    switch (field.type) {
+      case "Int":
+      case "BigInt":
+      case "Float":
+      case "Decimal": {
+        const numericValue = Number(rawValue);
+        return Number.isNaN(numericValue) ? rawValue : numericValue;
+      }
+      case "Boolean":
+        if (rawValue === "true") return true;
+        if (rawValue === "false") return false;
+        return rawValue;
+      case "DateTime": {
+        const dateValue = new Date(rawValue);
+        return Number.isNaN(dateValue.getTime()) ? rawValue : dateValue;
+      }
+      default:
+        return rawValue;
+    }
+  }
+
+  private buildSearchFilter(key: string, value: string) {
+    const field = this.modelFieldMap.get(key);
+
+    // Skip unknown or non-scalar fields to avoid Prisma "unknown argument" errors.
+    if (!field || (field.kind !== "scalar" && field.kind !== "enum")) return null;
+
+    const isUuidField =
+      field.kind === "scalar" &&
+      field.type === "String" &&
+      Array.isArray(field.nativeType) &&
+      field.nativeType[0] === "Uuid";
+
+    if (field.kind === "scalar" && field.type === "String" && !isUuidField) {
+      return {
+        [key]: {
+          contains: value,
+          mode: "insensitive",
+        },
+      };
+    }
+
+    return {
+      [key]: {
+        equals: this.normalizeSearchValue(value, field),
+      },
+    };
+  }
+
+  private getDefaultSearchOrderBy() {
+    if (this.modelFieldMap.has("created_at")) return { created_at: "desc" as const };
+    if (this.modelFieldMap.has("updated_at")) return { updated_at: "desc" as const };
+    if (this.modelFieldMap.has("id")) return { id: "desc" as const };
+    return undefined;
+  }
+
   async search(req: Request) {
     try {
       const query = req.query;
       const filters: any[] = [];
 
-      // loop over each query key dynamically
+      // Build filters dynamically from known scalar/enum model fields.
       for (const [key, value] of Object.entries(query)) {
-        if (value && typeof value === "string") {
-          filters.push({
-            [key]: {
-              contains: value,
-              mode: "insensitive",
-            },
-          });
-        }
+        if (!value || typeof value !== "string") continue;
+
+        const filter = this.buildSearchFilter(key, value);
+        if (filter) filters.push(filter);
       }
 
-      const queryOptions: any = {
-        where: {
-          OR: filters,
-        },
-      };
+      const queryOptions: any =
+        filters.length > 0
+          ? {
+              where: {
+                OR: filters,
+              },
+              orderBy: this.getDefaultSearchOrderBy(),
+            }
+          : {
+              orderBy: this.getDefaultSearchOrderBy(),
+            };
 
       // Only use signal if it exists
       const signal = (req as any).prismaSignal;
@@ -139,22 +211,76 @@ export class BaseRepository<
     }
   }
 
+  // getIds
+  async getIds(id: string, signal?: AbortSignal) {
+    try {
+      // Get user detail
+      const user = await this.model.findFirst({
+        where: { better_auth_id: id },
+        select: {
+          id: true,
+          [this.modelName === "student"
+            ? "student_registration_number"
+            : this.modelName === "teacher"
+              ? "teacher_registration_number"
+              : "first_name"]: true,
+        },
+        signal,
+      });
+
+      if (!user) this.handleError("User not found.");
+
+      // Get current branch
+      const branch = await this.prisma.branch.findFirst({
+        where: {
+          isCurrent: true,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
+      // Get latest academic year
+      const academic_year = branch
+        ? await this.prisma.academicyear.findFirst({
+            where: {
+              branch_id: branch.id,
+            },
+            select: { id: true },
+            take: 1,
+            orderBy: { start_date: "desc" },
+          })
+        : null;
+
+      const token = get_token();
+
+      if (!token) {
+        this.handleError("Error getting token.");
+      }
+
+      return {
+        user,
+        branch,
+        academic_year,
+        token,
+      };
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   handleError(error: unknown): never {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      console.log(
-        "%csrc/repositories/base.repositorie.js:149 error",
-        "color: #007acc;",
-        error
-      );
+      console.log('%csrc/repositories/base.repositorie.ts:204 error', 'color: #007acc;', error);
       throw new Error(
-        "An unexpected error occurred while doing operations with the database"
+        "An unexpected error occurred while doing operations with the database",
       );
     } else {
-      console.log(
-        "%csrc/repositories/base.repositorie.js:154 error",
-        "color: #007acc;",
-        error
-      );
+      console.log('%csrc/repositories/base.repositorie.ts:209 error', 'color: #007acc;', error);
+      if (typeof error === "string") {
+        throw new Error(error);
+      }
       throw new Error("An unexpected error occurred");
     }
   }
@@ -163,7 +289,6 @@ export class BaseRepository<
 export const handleError = (error: unknown): string => {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     return "An unexpected error occurred while doing operations with the database";
-  } else {
-    return "An unexpected error occurred";
   }
+  return "An unexpected error occurred";
 };

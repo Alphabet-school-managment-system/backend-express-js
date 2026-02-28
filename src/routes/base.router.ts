@@ -17,6 +17,12 @@ export const idSchema = z.object({
     .uuid({ message: "Invalid UUID format" })
     .or(z.string().min(32, "id must be at least 32 characters")),
 });
+const BetterAuthIdSchema = z.object({
+  id: z.union([
+    z.uuid({ message: "Invalid UUID format" }),
+    z.string().regex(/^[A-Za-z0-9]{32}$/, "Invalid Better Auth id format"),
+  ]),
+});
 
 export class BaseRouter<T extends CRUDController> {
   public router: Router;
@@ -59,7 +65,7 @@ export class BaseRouter<T extends CRUDController> {
     );
     this.router.get(
       "/getIds/:id",
-      validate(idSchema),
+      validate(BetterAuthIdSchema),
       this.controller.getIds.bind(this.controller),
     );
 

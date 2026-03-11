@@ -118,11 +118,13 @@ const createAcademicYearSchema = academicYearSchema.omit({
 export type AcademicYearInput = z.infer<typeof createAcademicYearSchema>;
 
 export const assessmentSchema = z.object({
-  id: z.string().uuid(),
-  title: z.string().max(100),
-  term: z.string().max(100),
-  subject: z.string().max(100),
-  max_score: z.number().int(),
+  title: z.string().trim().min(1, "required").max(50, "Max 50 characters"),
+  subject: z.string().trim(),
+  max_score: z.coerce
+    .number({ message: "required" })
+    .int("Max score must be a whole number")
+    .min(1, "Max score must be at least 1")
+    .max(100, "Max score cannot exceed 100"),
   note: z.string().max(250).nullable().optional(),
   teacher_id: z.string().uuid().nullable().optional(),
   created_at: z.coerce.date().nullable().optional(),

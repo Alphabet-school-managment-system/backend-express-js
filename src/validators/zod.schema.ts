@@ -131,14 +131,6 @@ export const assessmentSchema = z.object({
   updated_at: z.coerce.date().nullable().optional(),
 });
 
-const createAssessmentSchema = assessmentSchema.omit({
-  id: true,
-  created_at: true,
-  updated_at: true,
-});
-
-export type AssessmentInput = z.infer<typeof createAssessmentSchema>;
-
 export const attendanceSchema = z.object({
   id: z.string().uuid(),
   academic_year_id: z.string().uuid(),

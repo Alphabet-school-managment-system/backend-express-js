@@ -118,30 +118,27 @@ const createAcademicYearSchema = academicYearSchema.omit({
 export type AcademicYearInput = z.infer<typeof createAcademicYearSchema>;
 
 export const assessmentSchema = z.object({
-  id: z.string().uuid(),
-  title: z.string().max(100),
-  term: z.string().max(100),
-  subject: z.string().max(100),
-  max_score: z.number().int(),
+  academic_year_id: z.string().uuid(),
+  title: z.string().trim().min(1, "required").max(50, "Max 50 characters"),
+  subject: z.string().trim(),
+  grade: z.string().max(100).trim(),
+  section: z.string().max(100).trim().optional(),
+  max_score: z.coerce
+    .number({ message: "required" })
+    .int("Max score must be a whole number")
+    .min(1, "Max score must be at least 1")
+    .max(100, "Max score cannot exceed 100"),
   note: z.string().max(250).nullable().optional(),
   teacher_id: z.string().uuid().nullable().optional(),
   created_at: z.coerce.date().nullable().optional(),
   updated_at: z.coerce.date().nullable().optional(),
 });
 
-const createAssessmentSchema = assessmentSchema.omit({
-  id: true,
-  created_at: true,
-  updated_at: true,
-});
-
-export type AssessmentInput = z.infer<typeof createAssessmentSchema>;
-
 export const attendanceSchema = z.object({
   id: z.string().uuid(),
   academic_year_id: z.string().uuid(),
   term: z.string().max(100),
-  class: z.string().max(100),
+  grade: z.string().max(100),
   section: z.string().max(100),
   student_id: z.string().uuid(),
   date: z.coerce.date(),
@@ -331,16 +328,17 @@ const createLibraryItemLoanSchema = libraryItemLoanSchema.omit({
 export type LibraryItemLoanInput = z.infer<typeof createLibraryItemLoanSchema>;
 
 export const markSchema = z.object({
-  id: z.string().uuid(),
-  student_id: z.string().uuid(),
-  assessment_id: z.string().uuid(),
-  score: z.number(),
+  assessment_id: z.string().uuid("Invalid assessment id"),
+  student_id: z.string().uuid("Invalid student id"),
+  score: z.coerce
+    .number({ message: "required" })
+    .min(0, "Score must be at least 0")
+    .max(100, "Score cannot exceed 100"),
   created_at: z.coerce.date().nullable().optional(),
   updated_at: z.coerce.date().nullable().optional(),
 });
 
 const createMarkSchema = markSchema.omit({
-  id: true,
   created_at: true,
   updated_at: true,
 });

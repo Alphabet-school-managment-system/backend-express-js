@@ -111,7 +111,8 @@ export class BaseRepository<
     const field = this.modelFieldMap.get(key);
 
     // Skip unknown or non-scalar fields to avoid Prisma "unknown argument" errors.
-    if (!field || (field.kind !== "scalar" && field.kind !== "enum")) return null;
+    if (!field || (field.kind !== "scalar" && field.kind !== "enum"))
+      return null;
 
     const isUuidField =
       field.kind === "scalar" &&
@@ -136,8 +137,10 @@ export class BaseRepository<
   }
 
   private getDefaultSearchOrderBy() {
-    if (this.modelFieldMap.has("created_at")) return { created_at: "desc" as const };
-    if (this.modelFieldMap.has("updated_at")) return { updated_at: "desc" as const };
+    if (this.modelFieldMap.has("created_at"))
+      return { created_at: "desc" as const };
+    if (this.modelFieldMap.has("updated_at"))
+      return { updated_at: "desc" as const };
     if (this.modelFieldMap.has("id")) return { id: "desc" as const };
     return undefined;
   }
@@ -213,17 +216,24 @@ export class BaseRepository<
 
   // getIds
   async getIds(id: string, signal?: AbortSignal) {
+    const fields =
+      this.modelName === "teacher"
+        ? {
+            teacher_registration_number: true,
+            subject_specialization: true,
+          }
+        : this.modelName === "student"
+          ? {
+              student_registration_number: true,
+            }
+          : { first_name: true };
     try {
       // Get user detail
       const user = await this.model.findFirst({
         where: { better_auth_id: id },
         select: {
           id: true,
-          [this.modelName === "student"
-            ? "student_registration_number"
-            : this.modelName === "teacher"
-              ? "teacher_registration_number"
-              : "first_name"]: true,
+          ...fields,
         },
         signal,
       });
@@ -272,12 +282,20 @@ export class BaseRepository<
 
   handleError(error: unknown): never {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      console.log('%csrc/repositories/base.repositorie.ts:204 error', 'color: #007acc;', error);
+      console.log(
+        "%csrc/repositories/base.repositorie.ts:204 error",
+        "color: #007acc;",
+        error,
+      );
       throw new Error(
         "An unexpected error occurred while doing operations with the database",
       );
     } else {
-      console.log('%csrc/repositories/base.repositorie.ts:209 error', 'color: #007acc;', error);
+      console.log(
+        "%csrc/repositories/base.repositorie.ts:209 error",
+        "color: #007acc;",
+        error,
+      );
       if (typeof error === "string") {
         throw new Error(error);
       }

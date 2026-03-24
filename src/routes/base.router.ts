@@ -17,7 +17,7 @@ export const idSchema = z.object({
     .uuid({ message: "Invalid UUID format" })
     .or(z.string().min(32, "id must be at least 32 characters")),
 });
-const BetterAuthIdSchema = z.object({
+export const BetterAuthIdSchema = z.object({
   id: z.union([
     z.uuid({ message: "Invalid UUID format" }),
     z.string().regex(/^[A-Za-z0-9]{32}$/, "Invalid Better Auth id format"),

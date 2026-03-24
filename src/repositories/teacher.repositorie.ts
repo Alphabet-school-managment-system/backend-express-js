@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { BaseRepository } from "./base.repositorie.js";
 
 export class teacherRepo extends BaseRepository<"teacher"> {
@@ -12,5 +12,32 @@ export class teacherRepo extends BaseRepository<"teacher"> {
 
   async delete(id: string, signal?: AbortSignal) {
     return this.delete_people(id, signal);
+  }
+
+  async getMyAssignedGrade(req: Request) {
+    try {
+      const { teacher_id, academic_year_id } = req.params;
+      
+      if (!teacher_id || !academic_year_id) {
+        this.handleError("Teacher or academic year id not found.");
+      }
+
+      const grades = await this.prisma.timetable.findMany({
+        where: {
+          teacher_id: teacher_id,
+          academic_year_id: academic_year_id,
+        },
+        select: {
+          grade: true,
+          section: true,
+        },
+        distinct: ["grade", "section"],
+        orderBy: [{ grade: "asc" }, { section: "asc" }],
+      });
+
+      return grades;
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 }

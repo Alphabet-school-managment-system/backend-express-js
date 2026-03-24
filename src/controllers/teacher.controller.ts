@@ -9,4 +9,13 @@ export class TeacherController extends BaseController<
   constructor() {
     super(new TeacherService(), teacherSchema);
   }
+
+  async getMyAssignedGrade(req: any, res: any) {
+    try {
+      const result = await this.service.getMyAssignedGrade(req);
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }

@@ -135,11 +135,8 @@ export const assessmentSchema = z.object({
 });
 
 export const attendanceSchema = z.object({
-  id: z.string().uuid(),
   academic_year_id: z.string().uuid(),
-  term: z.string().max(100),
-  grade: z.string().max(100),
-  section: z.string().max(100),
+  term: z.string().max(100).optional(),
   student_id: z.string().uuid(),
   date: z.coerce.date(),
   created_at: z.coerce.date().nullable().optional(),
@@ -148,7 +145,6 @@ export const attendanceSchema = z.object({
 });
 
 const createAttendanceSchema = attendanceSchema.omit({
-  id: true,
   created_at: true,
   updated_at: true,
 });

@@ -306,7 +306,7 @@ const createLibraryItemSchema = libraryItemSchema.omit({
 export type LibraryItemInput = z.infer<typeof createLibraryItemSchema>;
 
 export const libraryItemLoanSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   item_id: z.string().uuid(),
   student_id: z.string().uuid().nullable().optional(),
   teacher_id: z.string().uuid().nullable().optional(),

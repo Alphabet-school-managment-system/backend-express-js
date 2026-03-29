@@ -1,4 +1,5 @@
 import { Response } from "express";
+import { Prisma } from "@prisma/client";
 import { BaseRepository } from "./base.repositorie.js";
 
 export class libraryItemRepo extends BaseRepository<"libraryitem"> {
@@ -34,7 +35,7 @@ export class libraryItemRepo extends BaseRepository<"libraryitem"> {
               registration_number: this.add_prefix_zeros(parentNumber),
             },
           },
-          signal
+          signal,
         );
 
         for (let i = 1; i < data.copies_available; i++) {
@@ -48,7 +49,7 @@ export class libraryItemRepo extends BaseRepository<"libraryitem"> {
         datas.push({
           ...data,
           registration_number: this.add_prefix_zeros(
-            last_registration_number + 1
+            last_registration_number + 1,
           ),
         });
       }
@@ -57,7 +58,7 @@ export class libraryItemRepo extends BaseRepository<"libraryitem"> {
         {
           data: datas,
         },
-        signal
+        signal,
       );
     } catch (error) {
       this.handleError(error);
@@ -88,7 +89,7 @@ export class libraryItemRepo extends BaseRepository<"libraryitem"> {
             },
           },
         },
-        { signal }
+        { signal },
       );
 
       const mappedParents = parents.map((p: any) => {
@@ -126,12 +127,52 @@ export class libraryItemRepo extends BaseRepository<"libraryitem"> {
     }
   }
 
-  async findById(branchId: string, signal?: AbortSignal) {
+  async findById(itemId: string, signal?: AbortSignal): Promise<any>;
+  async findById(
+    itemId: string,
+    userId?: string,
+    signal?: AbortSignal,
+  ): Promise<any>;
+  async findById(
+    itemId: string,
+    arg2?: string | AbortSignal,
+    _signal?: AbortSignal,
+  ) {
+    const userId = typeof arg2 === "string" ? arg2 : undefined;
     try {
-      return await this.model.findFirst({
-        where: { branch_id: branchId },
-        signal,
-      });
+      if (!userId) {
+        const rows = await this.prisma.$queryRaw<any[]>(
+          Prisma.sql`
+            SELECT li.*, li."_id" AS id, NULL::jsonb AS loan
+            FROM "libraryitem" li
+            WHERE li."_id" = CAST(${itemId} AS uuid)
+          `,
+        );
+
+        return rows[0] ?? null;
+      }
+
+      const rows = await this.prisma.$queryRaw<any[]>(
+        Prisma.sql`
+          SELECT li.*, li."_id" AS id, to_jsonb(l) AS loan
+          FROM "libraryitem" li
+          LEFT JOIN LATERAL (
+            SELECT l.*
+            FROM "libraryitemloan" l
+            WHERE l."item_id" = li."_id"
+              AND l."status" IN ('BORROWED','RESERVED')
+              AND (
+                l."student_id" = CAST(${userId} AS uuid)
+                OR l."teacher_id" = CAST(${userId} AS uuid)
+              )
+            ORDER BY l."issue_date" DESC
+            LIMIT 1
+          ) l ON true
+          WHERE li."_id" = CAST(${itemId} AS uuid)
+        `,
+      );
+
+      return rows[0] ?? null;
     } catch (error) {
       this.handleError(error);
     }

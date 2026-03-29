@@ -144,31 +144,77 @@ export class BaseRepository<
     if (this.modelFieldMap.has("id")) return { id: "desc" as const };
     return undefined;
   }
+  protected preProcessSearchQuery(query: any) {
+    const filters: any[] = [];
+
+    const rawAnd =
+      (typeof query.__and === "string" && query.__and) ||
+      (typeof query.and === "string" && query.and) ||
+      "";
+    const rawOr =
+      (typeof query.__or === "string" && query.__or) ||
+      (typeof query.or === "string" && query.or) ||
+      "";
+
+    const andFields = new Set(
+      rawAnd
+        .split(",")
+        .map((f: any) => f.trim())
+        .filter(Boolean),
+    );
+    const orFields = new Set(
+      rawOr
+        .split(",")
+        .map((f: any) => f.trim())
+        .filter(Boolean),
+    );
+
+    const andFilters: any[] = [];
+    const orFilters: any[] = [];
+
+    // Build filters dynamically from known scalar/enum model fields.
+    for (const [key, value] of Object.entries(query)) {
+      if (!value || typeof value !== "string") continue;
+      if (key === "__and" || key === "and" || key === "__or" || key === "or")
+        continue;
+
+      const filter = this.buildSearchFilter(key, value);
+      if (filter) {
+        if (andFields.has(key)) {
+          andFilters.push(filter);
+        } else if (orFields.has(key)) {
+          orFilters.push(filter);
+        } else {
+          filters.push(filter);
+        }
+      }
+    }
+
+    const defaultOrFilters = filters;
+    const combinedOrFilters = [...orFilters, ...defaultOrFilters];
+
+    let where: any = undefined;
+    if (andFilters.length > 0 && combinedOrFilters.length > 0) {
+      where = {
+        AND: [...andFilters, { OR: combinedOrFilters }],
+      };
+    } else if (andFilters.length > 0) {
+      where = { AND: andFilters };
+    } else if (combinedOrFilters.length > 0) {
+      where = { OR: combinedOrFilters };
+    }
+
+    const queryOptions: any = {
+      orderBy: this.getDefaultSearchOrderBy(),
+      ...(where ? { where } : {}),
+    };
+
+    return queryOptions;
+  }
 
   async search(req: Request) {
     try {
-      const query = req.query;
-      const filters: any[] = [];
-
-      // Build filters dynamically from known scalar/enum model fields.
-      for (const [key, value] of Object.entries(query)) {
-        if (!value || typeof value !== "string") continue;
-
-        const filter = this.buildSearchFilter(key, value);
-        if (filter) filters.push(filter);
-      }
-
-      const queryOptions: any =
-        filters.length > 0
-          ? {
-              where: {
-                OR: filters,
-              },
-              orderBy: this.getDefaultSearchOrderBy(),
-            }
-          : {
-              orderBy: this.getDefaultSearchOrderBy(),
-            };
+      const queryOptions: any = this.preProcessSearchQuery(req.query);
 
       // Only use signal if it exists
       const signal = (req as any).prismaSignal;

@@ -183,6 +183,7 @@ model libraryitem {
   author              String            @db.VarChar(255)
   item_type           LibraryItemType
   subject             String            @db.VarChar(50)
+  grade               String?           @db.VarChar(50)
   isbn                String?           @db.VarChar(50)
   copies_available    Int               @default(1) @db.Integer
   publication_date    DateTime          @db.Date
@@ -204,6 +205,8 @@ model libraryitemloan {
   return_date DateTime     @db.Date
   status      BorrowStatus @default(BORROWED)
   note        String?
+  created_at  DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?    @default(now()) @db.Timestamp(6)
   libraryitem libraryitem  @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   enrollment  enrollment?  @relation(fields: [student_id], references: [id], onUpdate: NoAction, onDelete: SetNull)
   teacher     teacher?     @relation(fields: [teacher_id], references: [id], onUpdate: NoAction, onDelete: SetNull)

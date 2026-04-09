@@ -10,6 +10,7 @@ export interface BaseRepository {
   }): Promise<any>;
   findById(id: string): Promise<any>;
   update(id: string, data: any): Promise<any>;
+  patch(id: string, data: any): Promise<any>;
   delete(id: string): Promise<any>;
   search(req: Request): Promise<any>;
   getIds(id: string): Promise<any>;
@@ -68,6 +69,10 @@ export class BaseService<TRepository extends BaseRepository> {
 
   async update(id: string, data: any) {
     return this.repository.update(id, data);
+  }
+
+  async patch(id: string, data: any) {
+    return this.repository.patch(id, data);
   }
 
   async delete(id: string) {

@@ -7,6 +7,7 @@ type CRUDController = {
   findAll: (req: Request, res: Response) => Promise<any>;
   findOne: (req: Request, res: Response) => Promise<any>;
   update: (req: Request, res: Response) => Promise<any>;
+  patch: (req: Request, res: Response) => Promise<any>;
   delete: (req: Request, res: Response) => Promise<any>;
   search: (req: Request, res: Response) => Promise<any>;
   getIds: (req: Request, res: Response) => Promise<any>;
@@ -27,25 +28,45 @@ export const BetterAuthIdSchema = z.object({
 export class BaseRouter<T extends CRUDController> {
   public router: Router;
   protected controller: T;
+  protected skipCreateRoute: boolean;
+  protected skipUpdateRoute: boolean;
 
-  constructor(controller: T, schema?: ZodObject) {
+  constructor(
+    controller: T,
+    schema?: ZodObject,
+    patchSchema?: ZodObject,
+    options?: { skipCreateRoute?: boolean; skipUpdateRoute?: boolean },
+  ) {
     this.router = Router();
     this.controller = controller;
-    this.initRoutes(schema);
+    this.skipCreateRoute = options?.skipCreateRoute ?? false;
+    this.skipUpdateRoute = options?.skipUpdateRoute ?? false;
+    this.initRoutes(schema, patchSchema);
   }
 
-  protected initRoutes(schema?: ZodObject) {
-    this.router.post(
-      "/",
-      validate(schema),
+  protected initRoutes(schema?: ZodObject, patchSchema?: ZodObject) {
+    if (!this.skipCreateRoute) {
+      this.router.post(
+        "/",
+        validate(schema),
+        authenticateToken,
+        this.controller.create.bind(this.controller),
+      );
+    }
+
+    if (!this.skipUpdateRoute) {
+      this.router.put(
+        "/:id/update",
+        validate(schema),
+        authenticateToken,
+        this.controller.update.bind(this.controller),
+      );
+    }
+    this.router.patch(
+      "/:id/patch",
+      validate(patchSchema ? idSchema.extend(patchSchema) : idSchema),
       authenticateToken,
-      this.controller.create.bind(this.controller),
-    );
-    this.router.put(
-      "/:id/update",
-      validate(schema),
-      authenticateToken,
-      this.controller.update.bind(this.controller),
+      this.controller.patch.bind(this.controller),
     );
     this.router.get(
       "/",

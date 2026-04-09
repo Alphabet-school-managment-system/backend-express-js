@@ -73,6 +73,14 @@ export class BaseRepository<
     }
   }
 
+  async patch(id: string, data: TUpdate, signal?: AbortSignal) {
+    try {
+      return await this.model.update({ where: { id }, data, signal });
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   async delete(id: string, signal?: AbortSignal) {
     try {
       return await this.model.delete({ where: { id }, signal });
@@ -294,6 +302,7 @@ export class BaseRepository<
         select: {
           id: true,
           name: true,
+          school_id: true,
         },
       });
 

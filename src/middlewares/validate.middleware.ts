@@ -3,7 +3,17 @@ import { ZodObject } from "zod";
 
 export function validate(schema?: ZodObject<any>) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const data = { ...req.body, ...req.params, ...req.query };
+    if (!schema) {
+      next();
+      return;
+    }
+
+    const data = {
+      ...req.body,
+      ...req.params,
+      ...req.query,
+      material_file: (req as any).file,
+    };
     const result: any = schema?.safeParse(data);
     if (!result.success) {
       console.log(

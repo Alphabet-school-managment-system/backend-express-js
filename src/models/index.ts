@@ -173,6 +173,34 @@ export interface Mark {
   updated_at?: Date | null;
 }
 
+export type LearningMaterialSource = "link" | "file";
+export type LearningMaterialType = "document" | "video";
+
+export type UploadedMaterialFile = {
+  buffer: Buffer;
+  mimetype: string;
+  originalname: string;
+  size: number;
+};
+
+export type LearningMaterial = {
+  id?: string;
+  title: string;
+  description?: string | null;
+  material_url?: string | null;
+  material_type: LearningMaterialType;
+  file_size: number;
+  uploaded_by: string;
+  branch_id: string;
+  grade?: string | null;
+  subject?: string | null;
+  material_source: LearningMaterialSource;
+  material_file?: UploadedMaterialFile | null;
+  status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  created_at?: Date | null;
+  updated_at?: Date | null;
+};
+
 export interface School {
   id: string;
   name: string;

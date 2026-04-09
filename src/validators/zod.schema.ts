@@ -1,5 +1,7 @@
 import z from "zod";
 
+const MAX_LEARNING_MATERIAL_FILE_SIZE_BYTES = 200 * 1024 * 1024;
+
 // Enums
 export enum AttendanceStatus {
   Present = "Present",
@@ -84,6 +86,22 @@ export enum BorrowStatus {
   OVERDUE = "OVERDUE",
   LOST = "LOST",
   DAMAGED = "DAMAGED",
+}
+
+export enum LearningMaterialStatus {
+  DRAFT = "DRAFT",
+  PUBLISHED = "PUBLISHED",
+  ARCHIVED = "ARCHIVED",
+}
+
+export enum LearningMaterialFileType {
+  DOCUMENT = "document",
+  VIDEO = "video",
+}
+
+export enum LearningMaterialSource {
+  LINK = "link",
+  FILE = "file",
 }
 
 export const signupSchema = z.object({
@@ -322,6 +340,181 @@ const createLibraryItemLoanSchema = libraryItemLoanSchema.omit({
 });
 
 export type LibraryItemLoanInput = z.infer<typeof createLibraryItemLoanSchema>;
+
+const learningMaterialBaseSchema = z.object({
+  id: z.string().uuid().nullable().optional(),
+  title: z
+    .string()
+    .trim()
+    .min(1, "Title is required")
+    .max(255, "Title must be 255 characters or less"),
+  description: z.string().nullable().optional(),
+  material_url: z.string().trim().optional(),
+  material_file: z.any().optional(),
+  material_type: z.nativeEnum(LearningMaterialFileType),
+  material_size: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(
+      MAX_LEARNING_MATERIAL_FILE_SIZE_BYTES,
+      "File size must be 200 MB or less.",
+    ),
+  uploaded_by: z.string().uuid(),
+  branch_id: z.string().uuid(),
+  school_id: z.string().uuid().optional(),
+  grade: z.string().max(50).optional(),
+  subject: z.string().max(100).optional(),
+  material_source: z
+    .nativeEnum(LearningMaterialSource)
+    .optional()
+    .default(LearningMaterialSource.LINK),
+  status: z
+    .nativeEnum(LearningMaterialStatus)
+    .optional()
+    .default(LearningMaterialStatus.DRAFT),
+  created_at: z.coerce.date().nullable().optional(),
+  updated_at: z.coerce.date().nullable().optional(),
+});
+
+const validateLearningMaterialCreate = (
+  data: z.infer<typeof learningMaterialBaseSchema>,
+  ctx: z.RefinementCtx,
+) => {
+  const materialUrl = data.material_url?.trim();
+
+  if (data.material_source === LearningMaterialSource.LINK) {
+    if (!materialUrl) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["material_url"],
+        message: "Material URL is required for linked materials.",
+      });
+    } else if (!z.string().url().safeParse(materialUrl).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["material_url"],
+        message: "Enter a valid URL for linked materials.",
+      });
+    }
+  }
+
+  if (data.material_source === LearningMaterialSource.FILE) {
+    if (!data.material_file) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["material_file"],
+        message: "Select a PDF or MP4 file.",
+      });
+    }
+
+    if (data.material_size <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["material_size"],
+        message: "File size is required for uploaded files.",
+      });
+    } else if (data.material_size > MAX_LEARNING_MATERIAL_FILE_SIZE_BYTES) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["material_size"],
+        message: "File size must be 200 MB or less.",
+      });
+    }
+  }
+};
+
+export const learningMaterialSchema = learningMaterialBaseSchema.superRefine(
+  validateLearningMaterialCreate,
+);
+
+const createLearningMaterialSchema = learningMaterialBaseSchema
+  .omit({
+    id: true,
+    created_at: true,
+    updated_at: true,
+  })
+  .superRefine(validateLearningMaterialCreate);
+
+export type LearningMaterialInput = z.infer<
+  typeof createLearningMaterialSchema
+>;
+
+const learningMaterialUpdateBaseSchema = learningMaterialBaseSchema.extend({
+  material_size: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(
+      MAX_LEARNING_MATERIAL_FILE_SIZE_BYTES,
+      "File size must be 200 MB or less.",
+    )
+    .optional(),
+});
+
+const validateLearningMaterialUpdate = (
+  data: z.infer<typeof learningMaterialUpdateBaseSchema>,
+  ctx: z.RefinementCtx,
+) => {
+  const materialUrl = data.material_url?.trim();
+
+  if (data.material_source === LearningMaterialSource.LINK) {
+    if (!materialUrl) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["material_url"],
+        message: "Material URL is required for linked materials.",
+      });
+    } else if (!z.string().url().safeParse(materialUrl).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["material_url"],
+        message: "Enter a valid URL for linked materials.",
+      });
+    }
+  }
+
+  if (data.material_source === LearningMaterialSource.FILE) {
+    if (!data.material_file && !materialUrl) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["material_url"],
+        message: "Keep the existing file URL or select a new PDF or MP4 file.",
+      });
+    }
+
+    if (
+      data.material_file &&
+      (typeof data.material_size !== "number" || data.material_size <= 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["material_size"],
+        message: "File size is required for uploaded files.",
+      });
+    } else if (
+      typeof data.material_size === "number" &&
+      data.material_size > MAX_LEARNING_MATERIAL_FILE_SIZE_BYTES
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["material_size"],
+        message: "File size must be 200 MB or less.",
+      });
+    }
+  }
+};
+
+export const learningMaterialUpdateSchema = learningMaterialUpdateBaseSchema
+  .omit({
+    created_at: true,
+    updated_at: true,
+  })
+  .superRefine(validateLearningMaterialUpdate);
+
+export type LearningMaterialUpdateInput = z.infer<
+  typeof learningMaterialUpdateSchema
+>;
 
 export const markSchema = z.object({
   assessment_id: z.string().uuid("Invalid assessment id"),

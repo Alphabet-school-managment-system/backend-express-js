@@ -75,21 +75,22 @@ model behavior {
 }
 
 model branch {
-  id              String            @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
-  school_id       String            @db.Uuid
-  name            String            @db.VarChar(100)
-  location        String?           @db.VarChar(255)
-  isCurrent       Boolean           @default(false) @db.Boolean
-  isDefault       Boolean           @default(false) @db.Boolean
-  academicyear    academicyear[]
-  school          school            @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  libraryitem     libraryitem[]
-  parent          parent[]
-  staff           staff[]
-  student         student[]
-  teacher         teacher[]
-  behavior        behavior[]
-  libraryItemLoan libraryitemloan[]
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  school_id         String             @db.Uuid
+  name              String             @db.VarChar(100)
+  location          String?            @db.VarChar(255)
+  isCurrent         Boolean            @default(false) @db.Boolean
+  isDefault         Boolean            @default(false) @db.Boolean
+  academicyear      academicyear[]
+  school            school             @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  libraryitem       libraryitem[]
+  parent            parent[]
+  staff             staff[]
+  student           student[]
+  teacher           teacher[]
+  behavior          behavior[]
+  libraryItemLoan   libraryitemloan[]
+  learningmaterials learningmaterial[]
 }
 
 model enrollment {
@@ -214,6 +215,26 @@ model libraryitemloan {
   branchId    String?      @db.Uuid
 }
 
+model learningmaterial {
+  id              String                           @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  title           String                           @db.VarChar(255)
+  description     String?                          @db.Text
+  material_url    String?                          @db.VarChar(500)
+  material_type   learning_material_file_type_enum @default(document)
+  material_size   Int                              @db.Integer
+  uploaded_by     String                           @db.Uuid
+  branch_id       String                           @db.Uuid
+  grade           String?                          @db.VarChar(50)
+  subject         String?                          @db.VarChar(100)
+  material_source learning_material_source_enum    @default(link)
+  status          learning_material_status_enum    @default(DRAFT)
+  created_at      DateTime?                        @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?                        @default(now()) @db.Timestamp(6)
+
+  teacher teacher @relation(fields: [uploaded_by], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  branch  branch  @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
 model mark {
   id            String     @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
   student_id    String     @db.Uuid
@@ -265,24 +286,24 @@ model staff {
 }
 
 model student {
-  id                          String          @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
-  branch_id                   String          @db.Uuid
-  better_auth_id              String          @db.VarChar(255)
-  first_name                  String          @db.VarChar(100)
-  middle_name                 String          @db.VarChar(100)
-  last_name                   String          @db.VarChar(100)
-  full_name_local             String          @db.VarChar(200)
+  id                          String             @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  branch_id                   String             @db.Uuid
+  better_auth_id              String             @db.VarChar(255)
+  first_name                  String             @db.VarChar(100)
+  middle_name                 String             @db.VarChar(100)
+  last_name                   String             @db.VarChar(100)
+  full_name_local             String             @db.VarChar(200)
   sex                         sex_enum
-  dob                         DateTime        @db.Date
+  dob                         DateTime           @db.Date
   address                     String
-  email                       String          @db.VarChar(100)
-  phone                       String          @db.VarChar(50)
+  email                       String             @db.VarChar(100)
+  phone                       String             @db.VarChar(50)
   note                        String?
-  image                       String?         @db.VarChar(255)
-  student_registration_number Int             @default(autoincrement())
+  image                       String?            @db.VarChar(255)
+  student_registration_number Int                @default(autoincrement())
   enrollment                  enrollment[]
   parentRelations             parentstudent[]
-  branch                      branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  branch                      branch?            @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   leaverequests               leaverequest[]
 }
 
@@ -302,9 +323,10 @@ model teacher {
   libraryItemLoan             libraryitemloan[]
   branch                      branch?           @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  timetable     timetable[]
-  assessment    assessment[]
-  leaverequests leaverequest[]
+  timetable         timetable[]
+  assessment        assessment[]
+  leaverequests     leaverequest[]
+  learningmaterials learningmaterial[]
 }
 
 model studentmarksummary {
@@ -447,6 +469,22 @@ enum BorrowStatus {
   OVERDUE
   LOST
   DAMAGED
+}
+
+enum learning_material_status_enum {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum learning_material_file_type_enum {
+  document
+  video
+}
+
+enum learning_material_source_enum {
+  link
+  file
 }
 
 model User {

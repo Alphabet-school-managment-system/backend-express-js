@@ -42,3 +42,5 @@ export type BorrowStatus =
   | "OVERDUE"
   | "LOST"
   | "DAMAGED";
+
+export type LearningMaterialSource = "link" | "file";

@@ -63,8 +63,9 @@ model attendance {
 model behavior {
   id               String             @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
   academic_year_id String             @db.Uuid
-  term             String             @db.VarChar(100)
+  term             String?            @db.VarChar(100)
   student_id       String             @db.Uuid
+  teacher_id       String             @db.Uuid
   date             DateTime           @db.Date
   description      String?
   type             behavior_type_enum
@@ -72,6 +73,7 @@ model behavior {
   academicyear     academicyear       @relation(fields: [academic_year_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   branch           branch?            @relation(fields: [branchId], references: [id])
   branchId         String?            @db.Uuid
+  teacher          teacher            @relation(fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model branch {
@@ -286,24 +288,24 @@ model staff {
 }
 
 model student {
-  id                          String             @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
-  branch_id                   String             @db.Uuid
-  better_auth_id              String             @db.VarChar(255)
-  first_name                  String             @db.VarChar(100)
-  middle_name                 String             @db.VarChar(100)
-  last_name                   String             @db.VarChar(100)
-  full_name_local             String             @db.VarChar(200)
+  id                          String          @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  branch_id                   String          @db.Uuid
+  better_auth_id              String          @db.VarChar(255)
+  first_name                  String          @db.VarChar(100)
+  middle_name                 String          @db.VarChar(100)
+  last_name                   String          @db.VarChar(100)
+  full_name_local             String          @db.VarChar(200)
   sex                         sex_enum
-  dob                         DateTime           @db.Date
+  dob                         DateTime        @db.Date
   address                     String
-  email                       String             @db.VarChar(100)
-  phone                       String             @db.VarChar(50)
+  email                       String          @db.VarChar(100)
+  phone                       String          @db.VarChar(50)
   note                        String?
-  image                       String?            @db.VarChar(255)
-  student_registration_number Int                @default(autoincrement())
+  image                       String?         @db.VarChar(255)
+  student_registration_number Int             @default(autoincrement())
   enrollment                  enrollment[]
   parentRelations             parentstudent[]
-  branch                      branch?            @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  branch                      branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   leaverequests               leaverequest[]
 }
 
@@ -327,6 +329,7 @@ model teacher {
   assessment        assessment[]
   leaverequests     leaverequest[]
   learningmaterials learningmaterial[]
+  behaviors         behavior[]
 }
 
 model studentmarksummary {

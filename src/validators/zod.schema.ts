@@ -170,10 +170,11 @@ const createAttendanceSchema = attendanceSchema.omit({
 export type AttendanceInput = z.infer<typeof createAttendanceSchema>;
 
 export const behaviorSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   academic_year_id: z.string().uuid(),
-  term: z.string().max(100),
+  term: z.string().max(100).nullable().optional(),
   student_id: z.string().uuid(),
+  teacher_id: z.string().uuid().nullable().optional(),
   date: z.coerce.date(),
   description: z.string().nullable().optional(),
   type: z.nativeEnum(BehaviorType),
@@ -205,7 +206,7 @@ export const enrollmentSchema = z.object({
   id: z.string().uuid().nullable().optional(),
   academic_year_id: z.string().uuid(),
   student_id: z.string().uuid(),
-  grade: z.number().int(),
+  grade: z.string(),
   section: z.string().max(100).nullable().optional(),
   isTransferred: z.boolean().nullable().optional(),
   transferredFrom: z.string().max(100).nullable().optional(),

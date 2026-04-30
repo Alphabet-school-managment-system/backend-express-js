@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { BaseRepository } from "./base.repositorie.js";
 
 export class EnrollmentRepository extends BaseRepository<"enrollment"> {
@@ -59,7 +59,7 @@ export class EnrollmentRepository extends BaseRepository<"enrollment"> {
             },
           },
         },
-        { signal }
+        { signal },
       );
 
       return results;
@@ -87,6 +87,35 @@ export class EnrollmentRepository extends BaseRepository<"enrollment"> {
         },
         signal,
       });
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async search(req: Request) {
+    try {
+      const signal = (req as any).prismaSignal;
+      const queryOptions = this.preProcessSearchQuery(req.query);
+
+      return await this.model.findMany(
+        {
+          ...queryOptions,
+          select: {
+            id: true,
+            student: {
+              select: {
+                id: true,
+                first_name: true,
+                middle_name: true,
+                last_name: true,
+                image: true,
+                student_registration_number: true,
+              },
+            },
+          },
+        },
+        { signal },
+      );
     } catch (error) {
       this.handleError(error);
     }

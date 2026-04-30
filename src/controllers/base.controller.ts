@@ -60,7 +60,9 @@ export class BaseController<TService extends CRUDService, TInput = any> {
 
   async update(req: Request, res: Response) {
     try {
-      const data = { ...req.body, material_file: (req as any).file };
+      const data: TInput = this.schema
+        ? this.schema.parse({ ...req.body, material_file: (req as any).file })
+        : { ...req.body, material_file: (req as any).file };
       const result = await this.service.update(req.params.id, data);
       res.json(result);
     } catch (error: any) {

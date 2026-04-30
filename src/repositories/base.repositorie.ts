@@ -6,7 +6,7 @@ import { get_token } from "../app.js";
 export const prisma = new PrismaClient();
 
 export class BaseRepository<
-  TModel extends keyof PrismaClient,
+  TModel extends string,
   TCreate = any,
   TUpdate = any,
 > {

@@ -69,6 +69,11 @@ export enum StaffRole {
   Admin = "Admin",
 }
 
+export enum Stream {
+  Natural_Sciences = "Natural_Sciences",
+  Social_Sciences = "Social_Sciences",
+}
+
 export enum LibraryItemType {
   BOOK = "book",
   MAGAZINE = "magazine",
@@ -210,6 +215,7 @@ export const enrollmentSchema = z.object({
   section: z.string().max(100).nullable().optional(),
   isTransferred: z.boolean().nullable().optional(),
   transferredFrom: z.string().max(100).nullable().optional(),
+  stream: z.nativeEnum(Stream).nullable().optional(),
   note: z.string().max(255).nullable().optional(),
   created_at: z.coerce.date().nullable().optional(),
   updated_at: z.coerce.date().nullable().optional(),

@@ -109,6 +109,11 @@ router.post("/signup", validate(signupSchema), async (req, res) => {
   auth_signup({
     data: { ...req.body, name: `${first_name}` },
     after_func: async ({ better_auth_id, tx }) => {
+      await tx.user.update({
+        where: { id: better_auth_id },
+        data: { role: "Admin" },
+      });
+
       const school = await tx.school.create({
         data: {
           name: req.body?.school_name,

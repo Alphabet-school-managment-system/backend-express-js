@@ -99,6 +99,7 @@ model enrollment {
   id               String            @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
   academic_year_id String            @db.Uuid
   student_id       String            @db.Uuid
+  stream           stream_enum?      @default(Natural_Sciences)
   grade            String            @db.VarChar(100)
   section          String?           @db.VarChar(100)
   isTransferred    Boolean?          @default(false) @db.Boolean
@@ -113,6 +114,8 @@ model enrollment {
   fee              fee[]
   libraryitemloan  libraryitemloan[]
   mark             mark[]
+  leaverequests    leaverequest[]
+  parentstudents   parentstudent[]
 }
 
 model expense {
@@ -174,8 +177,9 @@ model leaverequest {
   created_at       DateTime?          @default(now()) @db.Timestamp(6)
   updated_at       DateTime?          @default(now()) @db.Timestamp(6)
   academicyear     academicyear       @relation(fields: [academic_year_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  student          student?           @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  student          enrollment?        @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   teacher          teacher?           @relation(fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studentId        String?            @db.Uuid
 }
 
 model libraryitem {
@@ -304,9 +308,7 @@ model student {
   image                       String?         @db.VarChar(255)
   student_registration_number Int             @default(autoincrement())
   enrollment                  enrollment[]
-  parentRelations             parentstudent[]
   branch                      branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  leaverequests               leaverequest[]
 }
 
 model teacher {
@@ -368,8 +370,9 @@ model parentstudent {
   student_id String           @db.Uuid
   parent_id  String           @db.Uuid
   type       parent_type_enum
-  student    student          @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  student    enrollment       @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   parent     parent           @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  studentId  String?          @db.Uuid
 }
 
 model setting {
@@ -488,6 +491,11 @@ enum learning_material_file_type_enum {
 enum learning_material_source_enum {
   link
   file
+}
+
+enum stream_enum {
+  Natural_Sciences
+  Social_Sciences
 }
 
 model User {

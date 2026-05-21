@@ -41,4 +41,57 @@ export class markRepo extends BaseRepository<"mark"> {
 
     return { students: enrollments, assessment };
   }
+
+  async myAssessments(options: {
+    student_id: string;
+    grade: string;
+    section?: string;
+    subject: string;
+    academic_year_id: string;
+  }) {
+    const { student_id, grade, section, academic_year_id, subject } = options;
+
+    if (!student_id) {
+      this.handleError("student_id is required.");
+    }
+
+    if (!grade) {
+      this.handleError("grade is required.");
+    }
+
+    const assessments = await this.prisma.assessment.findMany({
+      where: {
+        grade,
+        subject,
+        ...(section
+          ? {
+              OR: [{ section }, { section: null }],
+            }
+          : {}),
+        ...(academic_year_id ? { academic_year_id } : {}),
+      },
+      select: {
+        id: true,
+        title: true,
+        max_score: true,
+        note: true,
+        created_at: true,
+        mark: {
+          where: { student_id },
+          select: {
+            score: true,
+          },
+          take: 1,
+        },
+      },
+      orderBy: {
+        created_at: "desc",
+      },
+    });
+
+    return assessments.map((assessment) => ({
+      ...assessment,
+      mark: assessment.mark[0] ?? { score: null },
+    }));
+  }
 }

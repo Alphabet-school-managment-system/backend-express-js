@@ -18,4 +18,22 @@ export class MarkService extends BaseService<markRepo> {
       },
     });
   }
+
+  async myAssessments(req: Request) {
+    const {
+      student_id,
+      grade,
+      section,
+      subject,
+      academic_year_id,
+    } = req.query;
+
+    return this.repository.myAssessments({
+      student_id: student_id as string,
+      grade: grade as string,
+      section: section as string | undefined,
+      subject: subject as string,
+      academic_year_id: academic_year_id as string,
+    });
+  }
 }

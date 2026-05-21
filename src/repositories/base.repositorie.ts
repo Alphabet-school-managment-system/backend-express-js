@@ -240,8 +240,22 @@ export class BaseRepository<
     const password = get_random_password();
 
     return auth_signup({
-      data: { name: `${first_name} ${middle_name}`, email, password },
+      data: {
+        name: `${first_name} ${middle_name}`,
+        email,
+        password,
+      },
       after_func: async ({ better_auth_id, tx }) => {
+        const role =
+          this.modelName === "staff" && data?.role ? data.role : this.modelName;
+
+        await tx.user.update({
+          where: { id: better_auth_id },
+          data: {
+            role,
+          },
+        });
+
         await tx[this.modelName].create({
           data: {
             ...data,
@@ -294,6 +308,19 @@ export class BaseRepository<
 
       if (!user) this.handleError("User not found.");
 
+      let enrollment = null;
+      if (this.modelName === "student" && user) {
+        enrollment = await this.prisma.enrollment.findFirst({
+          where: { student_id: user?.id },
+          select: {
+            id: true,
+            grade: true,
+            section: true,
+            stream: true,
+          },
+        });
+      }
+
       // Get current branch
       const branch = await this.prisma.branch.findFirst({
         where: {
@@ -329,6 +356,7 @@ export class BaseRepository<
         branch,
         academic_year,
         token,
+        enrollment,
       };
     } catch (error) {
       this.handleError(error);

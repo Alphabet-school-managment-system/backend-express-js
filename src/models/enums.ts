@@ -14,6 +14,8 @@ export type Sex = "Male" | "Female";
 
 export type LeaveStatus = "Pending" | "Approved" | "Rejected";
 
+export  type Stream = "Natural Sciences" | "Social Sciences";
+
 export type ParentType =
   | "Mother"
   | "Father"

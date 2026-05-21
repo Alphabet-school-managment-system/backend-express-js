@@ -10,6 +10,7 @@ import {
   LibraryItemType,
   Sex,
   StaffRole,
+  Stream,
 } from "./enums.js";
 
 export interface AcademicYear {
@@ -79,6 +80,7 @@ export interface Enrollment {
   section?: string | null;
   isTransferred?: boolean | null;
   transferredFrom?: string | null;
+  stream?: Stream | null;
   note?: string | null;
   created_at?: Date | null;
   updated_at?: Date | null;

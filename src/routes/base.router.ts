@@ -30,17 +30,27 @@ export class BaseRouter<T extends CRUDController> {
   protected controller: T;
   protected skipCreateRoute: boolean;
   protected skipUpdateRoute: boolean;
+  protected options?: {
+    skipCreateRoute?: boolean;
+    skipUpdateRoute?: boolean;
+    registerCustomRoutes?: (router: Router, controller: T) => void;
+  };
 
   constructor(
     controller: T,
     schema?: ZodObject,
     patchSchema?: ZodObject,
-    options?: { skipCreateRoute?: boolean; skipUpdateRoute?: boolean },
+    options?: {
+      skipCreateRoute?: boolean;
+      skipUpdateRoute?: boolean;
+      registerCustomRoutes?: (router: Router, controller: T) => void;
+    },
   ) {
     this.router = Router();
     this.controller = controller;
     this.skipCreateRoute = options?.skipCreateRoute ?? false;
     this.skipUpdateRoute = options?.skipUpdateRoute ?? false;
+    this.options = options;
     this.initRoutes(schema, patchSchema);
   }
 
@@ -78,6 +88,7 @@ export class BaseRouter<T extends CRUDController> {
       authenticateToken,
       this.controller.search.bind(this.controller),
     );
+    this.options?.registerCustomRoutes?.(this.router, this.controller);
     this.router.get(
       "/:id",
       validate(idSchema),

@@ -1,12 +1,12 @@
+import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { PrismaClient, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import nodemailer from "nodemailer";
 import { admin, emailOTP } from "better-auth/plugins";
 import { BACKEND_URL } from "../utils/constants.js";
 import { expo } from "@better-auth/expo";
-
-const prisma = new PrismaClient();
+import prisma from "../configs/db.js";
 const app: {
   url: string;
   name: string;

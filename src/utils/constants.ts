@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 export const TRUSTED_ORIGIN = [
   "http://localhost:3000",
   "https://alphabet-sms.vercel.app",

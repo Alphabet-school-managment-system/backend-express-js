@@ -1,9 +1,10 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 import { auth_signup, get_random_password } from "../routes/auth.route.js";
+import prisma from "../configs/db.js";
 import { get_token } from "../app.js";
 
-export const prisma = new PrismaClient();
+export { prisma };
 
 export class BaseRepository<
   TModel extends string,
@@ -14,7 +15,7 @@ export class BaseRepository<
   protected modelName: any;
   private modelFieldMap = new Map<string, any>();
 
-  protected prisma = new PrismaClient();
+  protected prisma = prisma;
 
   constructor(model: TModel) {
     this.model = (prisma as any)[model];

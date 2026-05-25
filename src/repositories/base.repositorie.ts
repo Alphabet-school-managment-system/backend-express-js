@@ -126,8 +126,11 @@ export class BaseRepository<
     const isUuidField =
       field.kind === "scalar" &&
       field.type === "String" &&
-      Array.isArray(field.nativeType) &&
-      field.nativeType[0] === "Uuid";
+      (field.name === "id" ||
+        field.name.endsWith("_id") ||
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          value,
+        ));
 
     if (field.kind === "scalar" && field.type === "String" && !isUuidField) {
       return {

@@ -291,23 +291,23 @@ model staff {
 }
 
 model student {
-  id                          String          @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
-  branch_id                   String          @db.Uuid
-  better_auth_id              String          @db.VarChar(255)
-  first_name                  String          @db.VarChar(100)
-  middle_name                 String          @db.VarChar(100)
-  last_name                   String          @db.VarChar(100)
-  full_name_local             String          @db.VarChar(200)
+  id                          String       @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  branch_id                   String       @db.Uuid
+  better_auth_id              String       @db.VarChar(255)
+  first_name                  String       @db.VarChar(100)
+  middle_name                 String       @db.VarChar(100)
+  last_name                   String       @db.VarChar(100)
+  full_name_local             String       @db.VarChar(200)
   sex                         sex_enum
-  dob                         DateTime        @db.Date
+  dob                         DateTime     @db.Date
   address                     String
-  email                       String          @db.VarChar(100)
-  phone                       String          @db.VarChar(50)
+  email                       String       @db.VarChar(100)
+  phone                       String       @db.VarChar(50)
   note                        String?
-  image                       String?         @db.VarChar(255)
-  student_registration_number Int             @default(autoincrement())
+  image                       String?      @db.VarChar(255)
+  student_registration_number Int          @default(autoincrement())
   enrollment                  enrollment[]
-  branch                      branch?         @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  branch                      branch?      @relation(fields: [branch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model teacher {
@@ -369,9 +369,8 @@ model parentstudent {
   student_id String           @db.Uuid
   parent_id  String           @db.Uuid
   type       parent_type_enum
-  student    enrollment       @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  enrollment enrollment       @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   parent     parent           @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  studentId  String?          @db.Uuid
 }
 
 model setting {

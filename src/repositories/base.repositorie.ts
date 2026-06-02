@@ -117,17 +117,44 @@ export class BaseRepository<
   }
 
   private buildSearchFilter(key: string, value: string) {
-    const field = this.modelFieldMap.get(key);
+    const betweenSuffix = "__between";
+    const isBetween = key.endsWith(betweenSuffix);
+    const fieldName = isBetween ? key.slice(0, -betweenSuffix.length) : key;
+    const field = this.modelFieldMap.get(fieldName);
 
     // Skip unknown or non-scalar fields to avoid Prisma "unknown argument" errors.
     if (!field || (field.kind !== "scalar" && field.kind !== "enum"))
       return null;
 
+    if (isBetween) {
+      const [rawStart, rawEnd] = value
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean);
+
+      if (!rawStart || !rawEnd) return null;
+
+      if (field.kind !== "scalar") return null;
+
+      const startValue = this.normalizeSearchValue(rawStart, field);
+      const endValue = this.normalizeSearchValue(rawEnd, field);
+
+      return {
+        [fieldName]: {
+          gte: startValue,
+          lte: endValue,
+        },
+      };
+    }
+
     const isUuidField =
       field.kind === "scalar" &&
       field.type === "String" &&
-      Array.isArray(field.nativeType) &&
-      field.nativeType[0] === "Uuid";
+      (field.name === "id" ||
+        field.name.endsWith("_id") ||
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          value,
+        ));
 
     if (field.kind === "scalar" && field.type === "String" && !isUuidField) {
       return {
@@ -371,20 +398,22 @@ export class BaseRepository<
         "color: #007acc;",
         error,
       );
-      throw new Error(
+       throw new Error(
         "An unexpected error occurred while doing operations with the database",
       );
-    } else {
-      console.log(
-        "%csrc/repositories/base.repositorie.ts:209 error",
-        "color: #007acc;",
-        error,
-      );
-      if (typeof error === "string") {
-        throw new Error(error);
-      }
-      throw new Error("An unexpected error occurred");
     }
+    console.log(
+      "%csrc/repositories/base.repositorie.ts:209 error",
+      "color: #007acc;",
+      error,
+    );
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    if (typeof error === "string") {
+      throw new Error(error);
+    }
+    throw new Error("An unexpected error occurred");
   }
 }
 

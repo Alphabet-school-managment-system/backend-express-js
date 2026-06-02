@@ -32,6 +32,15 @@ export class BehaviorRepository extends BaseRepository<"behavior"> {
                 },
               },
             },
+            teacher: {
+              select: {
+                id: true,
+                first_name: true,
+                middle_name: true,
+                image: true,
+                teacher_registration_number: true,
+              },
+            },
           },
         },
         { signal },

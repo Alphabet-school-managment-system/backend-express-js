@@ -677,7 +677,7 @@ const createTimetableSchema = timetableSchema.omit({
 export type TimetableInput = z.infer<typeof createTimetableSchema>;
 
 export const parentStudentSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   student_id: z.string().uuid(),
   parent_id: z.string().uuid(),
   type: z.nativeEnum(ParentType),

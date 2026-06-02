@@ -16,33 +16,57 @@ export class AttendanceRepository extends BaseRepository<"attendance"> {
     const academicYearId = options?.where?.academic_year_id ?? null;
     const grade = options?.where?.grade ?? null;
     const section = options?.where?.section ?? null;
+    const attendanceDate = date
+      ? new Date(`${date}T00:00:00.000Z`)
+      : undefined;
 
-    return await this.prisma.$queryRaw`
-      SELECT
-        json_build_object(
-          'id', e._id,
-          'first_name', s.first_name,
-          'middle_name', s.middle_name,
-          'last_name', s.last_name,
-          'image', s.image,
-          'student_registration_number', s.student_registration_number
-        ) AS info,
-        json_build_object(
-          'id', a._id,
-          'date', COALESCE(a.date, CAST(${date} AS date)),
-          'status', COALESCE(a.status, 'Present'),
-          'created_at', a.created_at
-        ) AS attendance
-      FROM enrollment e
-      JOIN student s ON s._id = e.student_id
-      LEFT JOIN attendance a
-        ON a.student_id = e._id
-        AND (${date} IS NULL OR a.date = CAST(${date} AS date))
-        AND (${academicYearId} IS NULL OR a.academic_year_id = CAST(${academicYearId} AS uuid))
-      WHERE (${grade} IS NULL OR e.grade = ${grade})
-        AND (${section} IS NULL OR e.section = ${section})
-        AND (${academicYearId} IS NULL OR e.academic_year_id = CAST(${academicYearId} AS uuid))
-      ORDER BY s.first_name, s.middle_name, s.last_name;
-    `;
+    const enrollments = await this.prisma.enrollment.findMany({
+      where: {
+        ...(grade ? { grade } : {}),
+        ...(section ? { section } : {}),
+        ...(academicYearId ? { academic_year_id: academicYearId } : {}),
+      },
+      select: {
+        id: true,
+        student: {
+          select: {
+            first_name: true,
+            middle_name: true,
+            last_name: true,
+            image: true,
+            student_registration_number: true,
+          },
+        },
+        attendance: {
+          where: {
+            ...(attendanceDate ? { date: attendanceDate } : {}),
+            ...(academicYearId ? { academic_year_id: academicYearId } : {}),
+          },
+          select: {
+            id: true,
+            date: true,
+            status: true,
+            created_at: true,
+          },
+          orderBy: {
+            created_at: "desc",
+          },
+          take: 1,
+        },
+      },
+      orderBy: {
+        student: {
+          first_name: "asc",
+        },
+      },
+    });
+
+    return enrollments.map((enrollment) => ({
+      info: {
+        id: enrollment.id,
+        ...enrollment.student,
+      },
+      attendance: enrollment.attendance[0] ?? null,
+    }));
   }
 }

@@ -32,7 +32,7 @@ export class MarkService extends BaseService<markRepo> {
       student_id: student_id as string,
       grade: grade as string,
       section: section as string | undefined,
-      subject: subject as string,
+      subject: subject as string | undefined,
       academic_year_id: academic_year_id as string,
     });
   }

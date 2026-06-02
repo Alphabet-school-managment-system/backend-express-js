@@ -46,7 +46,7 @@ export class markRepo extends BaseRepository<"mark"> {
     student_id: string;
     grade: string;
     section?: string;
-    subject: string;
+    subject?: string;
     academic_year_id: string;
   }) {
     const { student_id, grade, section, academic_year_id, subject } = options;
@@ -62,7 +62,7 @@ export class markRepo extends BaseRepository<"mark"> {
     const assessments = await this.prisma.assessment.findMany({
       where: {
         grade,
-        subject,
+        ...(subject ? { subject } : {}),
         ...(section
           ? {
               OR: [{ section }, { section: null }],
@@ -73,6 +73,7 @@ export class markRepo extends BaseRepository<"mark"> {
       select: {
         id: true,
         title: true,
+        subject: true,
         max_score: true,
         note: true,
         created_at: true,

@@ -15,30 +15,14 @@ export class studentRepo extends BaseRepository<"student"> {
   }
 
   async search(req: Request) {
-    try {
-      const queryOptions: any = this.preProcessSearchQuery(req.query);
-
-      // Only use signal if it exists
-      const signal = (req as any).prismaSignal;
-
-      return await this.model.findMany(
-        {
-          ...queryOptions,
-          include: {
-            enrollment: {
-              select: {
-                id: true,
-                grade: true,
-                section: true,
-                stream: true,
-              },
-            },
-          },
-        },
-        { signal },
-      );
-    } catch (error) {
-      this.handleError(error);
-    }
+    return this.search_people(req);
+  }
+  async findAll(options: {
+    where?: any;
+    orderBy?: any;
+    take?: number;
+    signal?: AbortSignal;
+  }) {
+    return this.findAll_people(options);
   }
 }

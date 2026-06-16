@@ -310,6 +310,63 @@ export class BaseRepository<
     }
   }
 
+  async search_people(req: Request) {
+    try {
+      const queryOptions: any = this.preProcessSearchQuery(req.query);
+
+      // Only use signal if it exists
+      const signal = (req as any).prismaSignal;
+
+      return await this.model.findMany(
+        {
+          ...queryOptions,
+          include: {
+            user: {
+              select: {
+                banned: true,
+                banReason: true,
+                banExpires: true,
+              },
+            },
+          },
+        },
+        { signal },
+      );
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async findAll_people(options: {
+    where?: any;
+    orderBy?: any;
+    take?: number;
+    signal?: AbortSignal;
+  }) {
+    const { where, orderBy, take, signal } = options;
+    try {
+      return await this.model.findMany(
+        {
+          where,
+          orderBy,
+          take,
+          include: {
+            user: {
+              select: {
+                banned: true,
+                banReason: true,
+                banExpires: true,
+              },
+            },
+          },
+        },
+        { signal },
+      );
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   // getIds
   async getIds(id: string, signal?: AbortSignal) {
     const fields =
@@ -398,7 +455,7 @@ export class BaseRepository<
         "color: #007acc;",
         error,
       );
-       throw new Error(
+      throw new Error(
         "An unexpected error occurred while doing operations with the database",
       );
     }

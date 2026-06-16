@@ -14,10 +14,23 @@ export class teacherRepo extends BaseRepository<"teacher"> {
     return this.delete_people(id, signal);
   }
 
+  async search(req: Request) {
+    return this.search_people(req);
+  }
+
+  async findAll(options: {
+    where?: any;
+    orderBy?: any;
+    take?: number;
+    signal?: AbortSignal;
+  }) {
+    return this.findAll_people(options);
+  }
+
   async getMyAssignedGrade(req: Request) {
     try {
       const { teacher_id, academic_year_id } = req.params;
-      
+
       if (!teacher_id || !academic_year_id) {
         this.handleError("Teacher or academic year id not found.");
       }

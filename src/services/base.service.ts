@@ -14,6 +14,7 @@ export interface BaseRepository {
   delete(id: string): Promise<any>;
   search(req: Request): Promise<any>;
   getIds(id: string): Promise<any>;
+  bulkUpdate(items: { ids: string[]; data: any }, signal?: any): Promise<any>;
 }
 
 export class BaseService<TRepository extends BaseRepository> {
@@ -53,7 +54,9 @@ export class BaseService<TRepository extends BaseRepository> {
       ...(si && { school_id: si }),
       ...(studentId && { student_id: studentId }),
       ...(day && { day }),
-      ...(grade && { grade: +grade }),
+      // Keep `grade` as the raw query string here. The repository will
+      // normalize types to match the Prisma model definition before querying.
+      ...(grade && { grade }),
       ...(section && { section }),
     };
 
@@ -89,5 +92,10 @@ export class BaseService<TRepository extends BaseRepository> {
 
   async getIds(id: string) {
     return this.repository.getIds(id);
+  }
+
+  async bulkUpdate(items: {ids: string[], data:any}, req?: Request) {
+    const signal = (req as any)?.prismaSignal;
+    return this.repository.bulkUpdate(items, signal);
   }
 }

@@ -358,7 +358,7 @@ model timetable {
   id               String       @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
   academic_year_id String       @db.Uuid
   term             String?      @db.VarChar(100)
-  grade            Int          @db.Integer
+  grade            String       @db.VarChar(100)
   section          String       @db.VarChar(100)
   subject          String       @db.VarChar(100)
   teacher_id       String       @db.Uuid

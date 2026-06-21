@@ -32,13 +32,13 @@ import timetableRoutes from "./routes/timetable.route.js";
 
 import jwt from "jsonwebtoken";
 
-import { toNodeHandler } from "better-auth/node";
+import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
+
 import { auth_client } from "./lib/auth.js";
 import { TRUSTED_ORIGIN } from "./utils/constants.js";
 
 const app = express();
 
-app.use(cors({ origin: true, credentials: true }));
 app.use(
   cors({
     origin: TRUSTED_ORIGIN,
@@ -47,7 +47,6 @@ app.use(
 );
 
 app.use(express.json());
-
 app.all("/api/auth/{*any}", toNodeHandler(auth_client({}).auth));
 
 const JWT_SECRET = process.env.JWT_SECRET;

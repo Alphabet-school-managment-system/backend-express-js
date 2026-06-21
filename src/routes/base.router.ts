@@ -11,6 +11,7 @@ type CRUDController = {
   delete: (req: Request, res: Response) => Promise<any>;
   search: (req: Request, res: Response) => Promise<any>;
   getIds: (req: Request, res: Response) => Promise<any>;
+  bulkUpdate: (req: Request, res: Response) => Promise<any>;
 };
 
 export const idSchema = z.object({
@@ -70,6 +71,13 @@ export class BaseRouter<T extends CRUDController> {
         validate(schema),
         authenticateToken,
         this.controller.update.bind(this.controller),
+      );
+    }
+    if (!this.skipUpdateRoute) {
+      this.router.put(
+        "/bulk-update",
+        authenticateToken,
+        this.controller.bulkUpdate.bind(this.controller),
       );
     }
     this.router.patch(

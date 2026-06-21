@@ -1,10 +1,11 @@
-import express, { Response } from "express";
+import express, { Response, Request } from "express";
 import { signupSchema } from "../validators/zod.schema.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { handleError, prisma } from "../repositories/base.repositorie.js";
 import { auth_client } from "../lib/auth.js";
 import z from "zod";
 import crypto from "crypto";
+import { fromNodeHeaders } from "better-auth/node";
 
 const router = express.Router();
 
@@ -44,11 +45,12 @@ export const auth_signup = async ({
   includePasswordInEmailTemplate?: boolean;
 }) => {
   let Better_auth_response: any = null;
+  let responseHeaders: any = null;
 
   try {
     const result = await prisma.$transaction(
       async (tx) => {
-        const { response } = await auth_client({
+        const { response, headers } = await auth_client({
           password: includePasswordInEmailTemplate ? data?.password : undefined,
         }).auth.api.signUpEmail({
           returnHeaders: true,
@@ -56,6 +58,7 @@ export const auth_signup = async ({
         });
 
         Better_auth_response = response;
+        responseHeaders = headers;
 
         await after_func({
           better_auth_id: response?.user?.id,
@@ -66,6 +69,13 @@ export const auth_signup = async ({
       },
       { timeout: 15000 },
     );
+
+    // Apply session headers/cookies from better-auth to the response
+    if (responseHeaders) {
+      Object.entries(responseHeaders).forEach(([key, value]) => {
+        res.setHeader(key, value as string);
+      });
+    }
 
     res.status(201).json({
       message: success_message,
@@ -103,6 +113,37 @@ export const auth_delete_user = async ({
   }
 };
 
+export const auth_verify_password = async ({
+  password,
+  res,
+  req,
+}: {
+  password: string;
+  res: Response;
+  req: Request;
+}) => {
+  try {
+    const session = await auth_client({}).auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+
+    if (!session) {
+      return res.status(401).json({ error: "No active session" });
+    }
+
+    const { status } = await auth_client({}).auth.api.verifyPassword({
+      body: {
+        password,
+      },
+      headers: fromNodeHeaders(req.headers),
+    });
+
+    return res.json({ data: status });
+  } catch (rollbackError: any) {
+    return res.status(400).json({ error: handleError(rollbackError) });
+  }
+};
+
 router.post("/signup", validate(signupSchema), async (req, res) => {
   const { first_name } = req.body;
 
@@ -132,6 +173,11 @@ router.post("/signup", validate(signupSchema), async (req, res) => {
     },
     res: res,
   });
+});
+
+router.post("/verify-password", async (req, res) => {
+  const { password } = req.body;
+  return await auth_verify_password({ password, res, req });
 });
 
 router.get(

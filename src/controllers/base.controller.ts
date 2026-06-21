@@ -10,6 +10,10 @@ type CRUDService = {
   delete: (id: string) => Promise<void>;
   search: (req: Request) => Promise<any>;
   getIds: (id: string) => Promise<any>;
+  bulkUpdate: (
+    items: { ids: string[]; data: any },
+    req?: Request,
+  ) => Promise<any>;
 };
 
 export class BaseController<TService extends CRUDService, TInput = any> {
@@ -107,6 +111,42 @@ export class BaseController<TService extends CRUDService, TInput = any> {
       res.json(result);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  }
+
+  async bulkUpdate(req: Request, res: Response) {
+    try {
+      const { ids, data } = req.body;
+
+      let parsedIds: any = undefined;
+
+      if (ids) {
+        if (typeof ids === "string") {
+          try {
+            parsedIds = JSON.parse(ids as string);
+          } catch (e) {
+            return res
+              .status(400)
+              .json({ error: "Error happen when parsing the JSON string" });
+          }
+        } else {
+          return res.status(400).json({ error: "Ids must be in JSON string" });
+        }
+      }
+
+      if (!parsedIds) {
+        return res
+          .status(400)
+          .json({ error: "Missing update data in query parameter 'data'" });
+      }
+
+      const result = await this.service.bulkUpdate(
+        { ids: parsedIds, data: data },
+        req,
+      );
+      res.json(result);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
     }
   }
 }

@@ -90,6 +90,34 @@ export class BaseRepository<
     }
   }
 
+  async bulkUpdate(
+    items: { ids: string[]; data: TUpdate },
+    signal?: AbortSignal,
+  ) {
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        const txModel = (tx as any)[this.modelName];
+
+        if (!Array.isArray(items)) {
+          const { ids, data } = items as { ids: string[]; data: TUpdate };
+          if (!Array.isArray(ids) || ids.length === 0) return [];
+
+            return await txModel.updateMany(
+              {
+                where: { id: { in: ids } },
+                data,
+              },
+              { signal }
+            );
+        } else {
+          this.handleError("Wrong ids and data format passed.");
+        }
+      });
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   private normalizeSearchValue(rawValue: string, field: any) {
     if (field?.kind !== "scalar" && field?.kind !== "enum") return rawValue;
 
@@ -477,6 +505,13 @@ export class BaseRepository<
 export const handleError = (error: unknown): string => {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     return "An unexpected error occurred while doing operations with the database";
+  } else if (error instanceof Error) {
+    return error.message;
+  } else if (typeof error === "string") {
+    return error;
+  } else if (error && typeof error === "object" && "message" in error) {
+    return String((error as any).message);
+  } else {
+    return "An unexpected error occurred";
   }
-  return "An unexpected error occurred";
 };

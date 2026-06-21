@@ -155,9 +155,8 @@ export const auth_client = ({
     ],
     trustedOrigins: [app?.url, "alphabet://", "alphabet://*"],
     cookies: {
-      sameSite: "none",
-      secure: true,
-      // secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
     },
   });
 

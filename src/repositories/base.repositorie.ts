@@ -102,13 +102,13 @@ export class BaseRepository<
           const { ids, data } = items as { ids: string[]; data: TUpdate };
           if (!Array.isArray(ids) || ids.length === 0) return [];
 
-            return await txModel.updateMany(
-              {
-                where: { id: { in: ids } },
-                data,
-              },
-              { signal }
-            );
+          return await txModel.updateMany(
+            {
+              where: { id: { in: ids } },
+              data,
+            },
+            { signal },
+          );
         } else {
           this.handleError("Wrong ids and data format passed.");
         }
@@ -325,6 +325,35 @@ export class BaseRepository<
     });
   }
 
+  async update_people(data: any, signal?: AbortSignal) {
+    try {
+      if (!data?.id) {
+        throw new Error("Missing id for people update.");
+      }
+
+      const user = await this.model.findUnique({
+        where: { id: data.id },
+        signal,
+      });
+
+      return await prisma.$transaction(async (tx) => {
+        await (tx as any)[this.modelName].update({
+          where: { id: data?.id },
+          data,
+        });
+
+        await tx["user"].update({
+          where: { id: user.better_auth_id },
+          data: {
+            role: data?.role,
+          },
+        });
+      });
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   async delete_people(id: string, signal?: AbortSignal) {
     try {
       const user = await this.model.findUnique({ where: { id }, signal });
@@ -345,6 +374,20 @@ export class BaseRepository<
       // Only use signal if it exists
       const signal = (req as any).prismaSignal;
 
+      const relationModel =
+        this.modelName === "student"
+          ? {
+              enrollment: {
+                select: {
+                  id: true,
+                  grade: true,
+                  section: true,
+                  stream: true,
+                },
+              },
+            }
+          : {};
+
       return await this.model.findMany(
         {
           ...queryOptions,
@@ -356,6 +399,7 @@ export class BaseRepository<
                 banExpires: true,
               },
             },
+            ...relationModel,
           },
         },
         { signal },

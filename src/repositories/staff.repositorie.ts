@@ -14,6 +14,10 @@ export class staffRepo extends BaseRepository<"staff"> {
     return this.delete_people(id, signal);
   }
 
+  async update(id: string, data: any, signal?: AbortSignal) {
+    return this.update_people({ id, ...data }, signal);
+  }
+
   async search(req: Request) {
     return this.search_people(req);
   }

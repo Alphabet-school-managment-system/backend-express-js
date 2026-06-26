@@ -64,9 +64,9 @@ export enum ParentType {
 }
 
 export enum StaffRole {
-  Librarian = "Librarian",
-  Accountant = "Accountant",
-  Admin = "Admin",
+  librarian = "librarian",
+  accountant = "accountant",
+  admin = "admin",
 }
 
 export enum Stream {

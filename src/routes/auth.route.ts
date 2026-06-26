@@ -67,7 +67,7 @@ export const auth_signup = async ({
 
         return response;
       },
-      { timeout: 15000 },
+      { timeout: 30000 },
     );
 
     // Apply session headers/cookies from better-auth to the response

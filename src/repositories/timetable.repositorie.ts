@@ -21,7 +21,7 @@ export class timetableRepo extends BaseRepository<"timetable"> {
             day,
           },
         },
-        { signal }
+        { signal },
       );
 
       if (existingSchedule) {
@@ -38,7 +38,7 @@ export class timetableRepo extends BaseRepository<"timetable"> {
             OR: [{ teacher_id, period, day }],
           },
         },
-        { signal }
+        { signal },
       );
 
       if (teacherConflict) {
@@ -71,12 +71,12 @@ export class timetableRepo extends BaseRepository<"timetable"> {
             NOT: { id },
           },
         },
-        { signal }
+        { signal },
       );
 
       if (existingSchedule) {
         throw new Error(
-          "A schedule for this combination (grade, section, period & day) already exists."
+          "A schedule for this combination (grade, section, period & day) already exists.",
         );
       }
 
@@ -90,18 +90,18 @@ export class timetableRepo extends BaseRepository<"timetable"> {
             NOT: { id },
           },
         },
-        { signal }
+        { signal },
       );
 
       if (teacherConflict) {
         throw new Error(
-          "The teacher already has a schedule at this day and period."
+          "The teacher already has a schedule at this day and period.",
         );
       }
 
       const result = await this.model.update(
         { where: { id }, data },
-        { signal }
+        { signal },
       );
 
       return result;
@@ -119,11 +119,10 @@ export class timetableRepo extends BaseRepository<"timetable"> {
     const { where = {}, take, signal } = options;
 
     try {
+      const normalizedWhere = this.normalizeWhereClause(where);
       const results = await this.model.findMany(
         {
-          where: {
-            ...where,
-          },
+          where: normalizedWhere,
           orderBy: { updated_at: "desc" },
           take,
           include: {
@@ -133,11 +132,12 @@ export class timetableRepo extends BaseRepository<"timetable"> {
                 first_name: true,
                 middle_name: true,
                 image: true,
+                teacher_registration_number: true,
               },
             },
           },
         },
-        { signal }
+        { signal },
       );
 
       return results;

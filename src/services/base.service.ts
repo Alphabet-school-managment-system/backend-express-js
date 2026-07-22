@@ -44,7 +44,7 @@ export class BaseService<TRepository extends BaseRepository> {
 
     const orderBy = sort_by
       ? { [sort_by as string]: sort_dir === "desc" ? "desc" : "asc" }
-      : undefined;
+      : { updated_at: "desc" };
 
     const take = limit ? parseInt(limit as string, 10) : 10;
 
@@ -94,7 +94,7 @@ export class BaseService<TRepository extends BaseRepository> {
     return this.repository.getIds(id);
   }
 
-  async bulkUpdate(items: {ids: string[], data:any}, req?: Request) {
+  async bulkUpdate(items: { ids: string[]; data: any }, req?: Request) {
     const signal = (req as any)?.prismaSignal;
     return this.repository.bulkUpdate(items, signal);
   }

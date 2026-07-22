@@ -38,11 +38,10 @@ export class EnrollmentRepository extends BaseRepository<"enrollment"> {
     const { where = {}, take, signal } = options;
 
     try {
+      const normalizedWhere = this.normalizeWhereClause(where);
       const results = await this.model.findMany(
         {
-          where: {
-            ...where,
-          },
+          where: normalizedWhere,
           orderBy: { updated_at: "desc" },
           take,
           include: {
@@ -55,6 +54,7 @@ export class EnrollmentRepository extends BaseRepository<"enrollment"> {
                 middle_name: true,
                 last_name: true,
                 image: true,
+                student_registration_number: true,
               },
             },
           },
@@ -95,9 +95,9 @@ export class EnrollmentRepository extends BaseRepository<"enrollment"> {
   async search(req: Request) {
     try {
       const signal = (req as any).prismaSignal;
-      const queryOptions = this.preProcessSearchQuery(req.query);
+      const queryOptions: any = this.preProcessSearchQuery(req.query);
 
-      return await this.model.findMany(
+      const result = await this.model.findMany(
         {
           ...queryOptions,
           select: {
@@ -116,6 +116,8 @@ export class EnrollmentRepository extends BaseRepository<"enrollment"> {
         },
         { signal },
       );
+
+      return result;
     } catch (error) {
       this.handleError(error);
     }

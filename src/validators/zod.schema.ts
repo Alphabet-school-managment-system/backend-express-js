@@ -85,12 +85,10 @@ export enum LibraryItemType {
 }
 
 export enum BorrowStatus {
-  RETURNED = "RETURNED",
-  BORROWED = "BORROWED",
-  RESERVED = "RESERVED",
-  OVERDUE = "OVERDUE",
-  LOST = "LOST",
-  DAMAGED = "DAMAGED",
+  RETURNED = "returned",
+  BORROWED = "borrowed",
+  RESERVED = "reserved",
+  LOST = "lost",
 }
 
 export enum LearningMaterialStatus {
@@ -211,7 +209,7 @@ export const enrollmentSchema = z.object({
   id: z.string().uuid().nullable().optional(),
   academic_year_id: z.string().uuid(),
   student_id: z.string().uuid(),
-  grade: z.string(),
+  grade: z.number().int(),
   section: z.string().max(100).nullable().optional(),
   isTransferred: z.boolean().nullable().optional(),
   transferredFrom: z.string().max(100).nullable().optional(),
@@ -248,7 +246,7 @@ const createExpenseSchema = expenseSchema.omit({
 export type ExpenseInput = z.infer<typeof createExpenseSchema>;
 
 export const feeSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable().optional(),
   academic_year_id: z.string().uuid(),
   student_id: z.string().uuid(),
   amount: z.number(),
@@ -332,14 +330,13 @@ export type LibraryItemInput = z.infer<typeof createLibraryItemSchema>;
 
 export const libraryItemLoanSchema = z.object({
   id: z.string().uuid().nullable().optional(),
-  item_id: z.string().uuid(),
+  item_id: z.string().uuid().optional(),
   student_id: z.string().uuid().nullable().optional(),
   teacher_id: z.string().uuid().nullable().optional(),
-  issue_date: z.coerce.date(),
-  return_date: z.coerce.date(),
-  status: z.nativeEnum(BorrowStatus),
+  issue_date: z.coerce.date().nullable().optional(),
+  return_date: z.coerce.date().nullable().optional(),
+  status: z.nativeEnum(BorrowStatus).optional().default(BorrowStatus.BORROWED),
   note: z.string().nullable().optional(),
-  branchId: z.string().uuid().nullable().optional(),
 });
 
 const createLibraryItemLoanSchema = libraryItemLoanSchema.omit({
@@ -662,6 +659,7 @@ export const timetableSchema = z.object({
   academic_year_id: z.string().uuid(),
   term: z.string().nullable().optional(),
   grade: z.number().int(),
+  stream: z.nativeEnum(Stream).nullable().optional(),
   section: z.string().max(100),
   subject: z.string().max(100),
   teacher_id: z.string().uuid(),

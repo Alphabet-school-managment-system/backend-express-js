@@ -14,6 +14,14 @@ export class BaseRepository<
   protected model: any;
   protected modelName: any;
   private modelFieldMap = new Map<string, any>();
+  private static readonly enrollmentStudentSearchableFields = new Set([
+    "first_name",
+    "middle_name",
+    "last_name",
+    "student_registration_number",
+    "email",
+    "phone",
+  ]);
 
   protected prisma = prisma;
 
@@ -47,7 +55,7 @@ export class BaseRepository<
     try {
       return await this.model.findMany(
         {
-          where,
+          where: this.normalizeWhereClause(where),
           orderBy,
           take,
         },
@@ -56,6 +64,62 @@ export class BaseRepository<
     } catch (error) {
       this.handleError(error);
     }
+  }
+
+  private normalizeWhereFilters(value: any, field: any): any {
+    if (value === null || value === undefined) return value;
+    if (typeof value !== "object" || Array.isArray(value)) return value;
+
+    const normalized: any = {};
+    for (const [key, nestedValue] of Object.entries(value)) {
+      if (typeof nestedValue === "string") {
+        normalized[key] = this.normalizeSearchValue(nestedValue, field);
+      } else if (
+        nestedValue &&
+        typeof nestedValue === "object" &&
+        !Array.isArray(nestedValue)
+      ) {
+        normalized[key] = this.normalizeWhereFilters(nestedValue, field);
+      } else {
+        normalized[key] = nestedValue;
+      }
+    }
+    return normalized;
+  }
+
+  protected normalizeWhereClause(where: any): any {
+    if (!where || typeof where !== "object") return where;
+    if (Array.isArray(where))
+      return where.map((item) => this.normalizeWhereClause(item));
+
+    const normalized: any = {};
+
+    for (const [key, value] of Object.entries(where)) {
+      if (key === "AND" || key === "OR" || key === "NOT") {
+        normalized[key] = Array.isArray(value)
+          ? value.map((item) => this.normalizeWhereClause(item))
+          : this.normalizeWhereClause(value);
+        continue;
+      }
+
+      const field = this.modelFieldMap.get(key);
+
+      if (field) {
+        if (typeof value === "string") {
+          normalized[key] = this.normalizeSearchValue(value, field);
+          continue;
+        }
+
+        if (value && typeof value === "object") {
+          normalized[key] = this.normalizeWhereFilters(value, field);
+          continue;
+        }
+      }
+
+      normalized[key] = this.normalizeWhereClause(value);
+    }
+
+    return normalized;
   }
 
   async findById(id: string, signal?: AbortSignal) {
@@ -150,54 +214,166 @@ export class BaseRepository<
     const fieldName = isBetween ? key.slice(0, -betweenSuffix.length) : key;
     const field = this.modelFieldMap.get(fieldName);
 
-    // Skip unknown or non-scalar fields to avoid Prisma "unknown argument" errors.
-    if (!field || (field.kind !== "scalar" && field.kind !== "enum"))
-      return null;
+    if (field) {
+      // Skip unknown relation fields to avoid Prisma "unknown argument" errors.
+      if (field.kind !== "scalar" && field.kind !== "enum") return null;
 
-    if (isBetween) {
-      const [rawStart, rawEnd] = value
-        .split(",")
-        .map((part) => part.trim())
-        .filter(Boolean);
+      if (isBetween) {
+        const [rawStart, rawEnd] = value
+          .split(",")
+          .map((part) => part.trim())
+          .filter(Boolean);
 
-      if (!rawStart || !rawEnd) return null;
+        if (!rawStart || !rawEnd) return null;
 
-      if (field.kind !== "scalar") return null;
+        if (field.kind !== "scalar") return null;
 
-      const startValue = this.normalizeSearchValue(rawStart, field);
-      const endValue = this.normalizeSearchValue(rawEnd, field);
+        const startValue = this.normalizeSearchValue(rawStart, field);
+        const endValue = this.normalizeSearchValue(rawEnd, field);
+
+        return {
+          [fieldName]: {
+            gte: startValue,
+            lte: endValue,
+          },
+        };
+      }
+
+      const isUuidField =
+        field.kind === "scalar" &&
+        field.type === "String" &&
+        (field.name === "id" ||
+          field.name.endsWith("_id") ||
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+            value,
+          ));
+
+      if (field.kind === "scalar" && field.type === "String" && !isUuidField) {
+        return {
+          [key]: {
+            contains: value,
+            mode: "insensitive",
+          },
+        };
+      }
 
       return {
-        [fieldName]: {
-          gte: startValue,
-          lte: endValue,
+        [key]: {
+          equals: this.normalizeSearchValue(value, field),
         },
       };
     }
 
-    const isUuidField =
-      field.kind === "scalar" &&
-      field.type === "String" &&
-      (field.name === "id" ||
+    return this.buildRelationSearchFilter(key, value);
+  }
+
+  private parseRelationQueryKey(key: string) {
+    if (key.includes(".")) {
+      const parts = key.split(".");
+      if (parts.length < 2) return null;
+
+      return {
+        relationPath: parts.slice(0, -1),
+        fieldName: parts[parts.length - 1],
+      };
+    }
+
+    const [relationName, ...rest] = key.split("_");
+    if (rest.length > 0) {
+      const relationField = this.modelFieldMap.get(relationName);
+      if (relationField?.kind === "object") {
+        return { relationPath: [relationName], fieldName: rest.join("_") };
+      }
+    }
+
+    return null;
+  }
+
+  private buildRelationLeafFilter(field: any, value: string) {
+    // Only apply string filters to String fields
+    if (field.kind === "scalar" && field.type === "String") {
+      const isUuidField =
+        field.name === "id" ||
         field.name.endsWith("_id") ||
         /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
           value,
-        ));
+        );
 
-    if (field.kind === "scalar" && field.type === "String" && !isUuidField) {
-      return {
-        [key]: {
-          contains: value,
-          mode: "insensitive",
-        },
-      };
+      if (!isUuidField) {
+        return {
+          [field.name]: {
+            contains: value,
+            mode: "insensitive",
+          },
+        };
+      }
     }
 
     return {
-      [key]: {
+      [field.name]: {
         equals: this.normalizeSearchValue(value, field),
       },
     };
+  }
+
+  private buildRelationSearchFilterFromRelationField(
+    relationField: any,
+    targetFieldName: string,
+    value: string,
+  ) {
+    if (!relationField || relationField.kind !== "object") return null;
+
+    const relatedModel = Prisma.dmmf.datamodel.models.find(
+      ({ name }) => name === relationField.type,
+    );
+    if (!relatedModel) return null;
+
+    const field = relatedModel.fields.find(
+      (item) => item.name === targetFieldName,
+    );
+    if (!field || (field.kind !== "scalar" && field.kind !== "enum"))
+      return null;
+
+    const relationCondition = relationField.isList ? "some" : "is";
+
+    return {
+      [relationField.name]: {
+        [relationCondition]: this.buildRelationLeafFilter(field, value),
+      },
+    };
+  }
+
+  private buildRelationSearchFilter(key: string, value: string) {
+    const explicitRelation = this.parseRelationQueryKey(key);
+    if (explicitRelation) {
+      const relationField = this.modelFieldMap.get(
+        explicitRelation.relationPath[0],
+      );
+      return this.buildRelationSearchFilterFromRelationField(
+        relationField,
+        explicitRelation.fieldName,
+        value,
+      );
+    }
+
+    const currentModel = Prisma.dmmf.datamodel.models.find(
+      ({ name }) => name === this.modelName,
+    );
+    if (!currentModel) return null;
+
+    for (const relationField of currentModel.fields.filter(
+      (field) => field.kind === "object",
+    )) {
+      const filter = this.buildRelationSearchFilterFromRelationField(
+        relationField,
+        key,
+        value,
+      );
+
+      if (filter) return filter;
+    }
+
+    return null;
   }
 
   private getDefaultSearchOrderBy() {
@@ -208,6 +384,7 @@ export class BaseRepository<
     if (this.modelFieldMap.has("id")) return { id: "desc" as const };
     return undefined;
   }
+
   protected preProcessSearchQuery(query: any) {
     const filters: any[] = [];
 

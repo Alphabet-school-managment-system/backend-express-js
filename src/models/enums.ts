@@ -14,7 +14,7 @@ export type Sex = "Male" | "Female";
 
 export type LeaveStatus = "Pending" | "Approved" | "Rejected";
 
-export  type Stream = "Natural Sciences" | "Social Sciences";
+export type Stream = "Natural Sciences" | "Social Sciences";
 
 export type ParentType =
   | "Mother"
@@ -37,12 +37,6 @@ export type LibraryItemType =
   | "REFERENCE_BOOK"
   | "OTHER";
 
-export type BorrowStatus =
-  | "RETURNED"
-  | "BORROWED"
-  | "RESERVED"
-  | "OVERDUE"
-  | "LOST"
-  | "DAMAGED";
+export type BorrowStatus = "returned" | "borrowed" | "reserved" | "lost";
 
 export type LearningMaterialSource = "link" | "file";
